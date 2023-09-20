@@ -2,7 +2,7 @@
 
 struct Polygon
 {
-    ColorDouble color; //ändra eventuellt till material senare?
+   // ColorDouble color; //ändra eventuellt till material senare?
     glm::vec3 unitNormal;
 
 

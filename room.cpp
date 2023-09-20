@@ -1,3 +1,5 @@
+#pragma once
+#include "dependencies.hpp"
 
 Room::Room() {
 	create_Room();
@@ -26,7 +28,7 @@ void create_Room() {
 
 
 	//Eye
-	const glm::vec3 eye = glm::vec3(-1.0f, 0.0f, 0.0f);
+	//const glm::vec3 eye = glm::vec3(-1.0f, 0.0f, 0.0f);
 	//camera
-	const glm::vec3 camera = glm::vec3(0.0f, 0.0f, 0.0f);
+	//const glm::vec3 camera = glm::vec3(0.0f, 0.0f, 0.0f);
 }

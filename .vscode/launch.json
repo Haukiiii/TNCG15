@@ -5,7 +5,7 @@
             "name": "C/C++: clang++ build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${/..}",
+            "program": "/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15/main",//ändra till en allmän path(inte specifik till kentons dator)
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

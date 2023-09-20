@@ -1,5 +1,15 @@
-{
+/* {
     "files.associations": {
         "iostream": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15/glm"
+}
+ */
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "cstddef": "cpp"
+    },
+    "cmake.sourceDirectory": "/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15/glm",
+    "C_Cpp.default.cppStandard": "c++20"
 }
