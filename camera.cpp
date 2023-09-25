@@ -11,8 +11,13 @@ Camera::Camera(glm::vec3 eye) : eye{ eye } {
 
     pixels = new std::array<Pixel, res*res>(); 
     pixels->fill(Pixel{ glm::dvec3(0.0, 0.0, 0.0) }); //may not be needed (ensure pixels initialized with black)
-}
-    void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t yLowerBound, size_t yUpperBound) {
+}   
 
-    }
+Pixel& Camera::getPixel(size_t i, size_t j) {
+    return(*pixels)[i * res + j]; //expression computes the linear index of the pixel within the one-dimensional array represented by (*pixels)
+}
+
+void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t yLowerBound, size_t yUpperBound) {
+
+}
 

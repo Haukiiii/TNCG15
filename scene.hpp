@@ -3,4 +3,8 @@
 
 struct Scene {
 
+    std::vector<Polygon*> polygon; 
+
+
+
 };

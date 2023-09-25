@@ -14,9 +14,12 @@ struct Camera {
     //constructor 
     Camera(glm::vec3 eye);
 
+    //function returning reference to a pixel at row 'i' column 'j'
+    Pixel& getPixel(size_t i, size_t j);
+    
     //function to create the rgb image.
     void createImage(const std::string& file_path);
 
-    //function for rendering argumentlist containing the scene as well as the bounds of the image.
+    //main rendering function, sends a ray from the eye position through each pixel, argumentlist: the scene as well as the bounds of the image.
     void render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t yLowerBound, size_t yUpperBound);
 };
