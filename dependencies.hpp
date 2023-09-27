@@ -23,6 +23,7 @@
 constexpr float treshold_importance = 0.1f;
 
 constexpr size_t res = 800; //resolution of the image (res*res)
+constexpr int samples = 4;
 
 //predefined colors
 const glm::dvec3 red{ 1.0, 0.0, 0.0 };

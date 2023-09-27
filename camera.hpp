@@ -20,6 +20,6 @@ struct Camera {
     //function to create the rgb image.
     void createImage(const std::string& file_path);
 
-    //main rendering function, sends a ray from the eye position through each pixel, argumentlist: the scene as well as the bounds of the image.
+    //main rendering function, sends a ray from the eye position through each pixel, argumentlist: the scene, 0, res, 0, res
     void render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t yLowerBound, size_t yUpperBound);
 };
