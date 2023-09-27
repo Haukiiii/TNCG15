@@ -9,7 +9,6 @@ struct Scene {
 
     //TODO add functions for ligthning 
 
-
     void rayTarget(Ray& ray) const;
     void traceRay(std::shared_ptr<Ray>& root) const;
 
