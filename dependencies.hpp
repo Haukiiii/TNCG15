@@ -20,6 +20,8 @@
 #include <memory>
 
 //settings
+constexpr float treshold_importance = 0.1f;
+
 constexpr size_t res = 800; //resolution of the image (res*res)
 
 //predefined colors
