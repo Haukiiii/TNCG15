@@ -1,0 +1,2 @@
+/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15/build/CMakeFiles/edit_cache.dir
+/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15/build/CMakeFiles/rebuild_cache.dir
