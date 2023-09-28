@@ -69,7 +69,8 @@
         "chrono": "cpp",
         "compare": "cpp",
         "concepts": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "thread": "cpp"
     },
     "cmake.sourceDirectory": "/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15/glm",
     "C_Cpp.default.cppStandard": "c++20"

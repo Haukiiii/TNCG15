@@ -1,4 +1,5 @@
 #pragma once
+
 #include "dependencies.hpp"
 
 struct Room {

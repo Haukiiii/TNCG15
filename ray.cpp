@@ -1,4 +1,3 @@
-#pragma once
 #include "dependencies.hpp"
 
 //constructor using start/endpoint, importance initialized with 1.0

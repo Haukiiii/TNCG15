@@ -6,8 +6,12 @@
 
 #ifndef TYPEDEFS_DEPENDENCIES
 #define TYPEDEFS_DEPENDENCIES
+#endif
 
-#include <cstddef> //to use size_t? Should work just by compiling with c++20
+#ifndef DEPENDENCIES_HPP
+#define DEPENDENCIES_HPP
+
+//#include <cstddef> //to use size_t? Should work just by compiling with c++20
 
 
 //libraries
@@ -18,6 +22,9 @@
 #include "glm/gtx/string_cast.hpp"
 #include <cstdlib>
 #include <memory>
+#include <fstream>
+#include <chrono>
+#include <thread>
 
 //settings
 constexpr float treshold_importance = 0.1f;
@@ -40,6 +47,7 @@ const glm::dvec3 white{ 1.0, 1.0, 1.0 };
 
 
 //structs/headers
+struct Room;
 struct Pixel;
 struct Object;
 struct Scene;
@@ -47,12 +55,13 @@ struct Ray;
 struct Camera;
 struct Material;
 
+
 #include "Pixel.hpp"
 #include "Material.hpp"
 #include "Polygon.hpp"
-#include "Room.hpp"
 #include "Scene.hpp"
 #include "Ray.hpp"
 #include "Camera.hpp"
+#include "Room.hpp"
 
 #endif

@@ -1,3 +1,4 @@
+#pragma once
 #include "dependencies.hpp"
 
 struct Ray {
