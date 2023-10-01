@@ -41,10 +41,10 @@ glm::vec3 Rectangle::CalcUnitNormal(const glm::vec3& hit)
 float Triangle::rayIntersection(Ray* ray){ //lecture 4 möller trumbore 
 
     //check if intersection is possible (scalar product between raydirection and surface normal must be negative)
-    if(glm::dot(ray->direction, normal) > 0) 
-    {
-        return -1.0; //no intersection possible
-    }
+    // if(glm::dot(ray->direction, normal) > 0.0f) 
+    // {
+    //     return -1.0f; //no intersection possible
+    // } // this does not work for some reason...
 
     //define T, P, Q, already have D, E1, E2
     glm::vec3 T = ray->startpoint - vertices[0];

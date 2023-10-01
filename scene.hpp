@@ -3,7 +3,7 @@
 
 struct Scene {
 
-    std::vector<Polygon*> polygon; //stores all geometry
+    std::vector<Polygon*> polygons; //stores all geometry
 
     void addPolygon(Polygon* pol);
 

@@ -44,12 +44,15 @@ void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t
                 Ray ray{start, interSectionPixel}; 
 
                 scene.rayTarget(ray); //this gives sets endpoint of the ray, which intersects the closest object, surface intersection information stored in ray->target
+                if(ray.target != nullptr){ //undvik eventuella nullptr, ska inte förekomma egentligen men verkar göra det?...
+                    p.pixelColor = ray.target->material->color;
+                }
 
-                p.pixelColor = ray.target->material->color;
+               
             }
         }
     }
-    createImage;
+    createImage();
 }
 
 void Camera::createImage() {

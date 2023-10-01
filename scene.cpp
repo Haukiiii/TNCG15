@@ -1,7 +1,7 @@
 #include "dependencies.hpp"
 
     void Scene::addPolygon(Polygon* pol){
-        polygon.push_back(pol);
+        polygons.push_back(pol);
     }
 
 
@@ -9,10 +9,10 @@
 
         float closest_pol = std::numeric_limits<double>::max();
 
-        for(Polygon* pol: this->polygon){
-            float X_hit = pol->rayIntersection(&ray);
-            if(X_hit > 0.0 && X_hit < closest_pol){
-                closest_pol = X_hit;
+        for(Polygon* pol : this->polygons){
+            float X_intersection = pol->rayIntersection(&ray); //is -1.0 if there is no intersection (see rayIntersection)
+            if(X_intersection > 0.0f && X_intersection < closest_pol){
+                closest_pol = X_intersection;
                 ray.target = pol;
                 ray.setEndpoint(closest_pol);
             }

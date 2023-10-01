@@ -12,7 +12,7 @@ Ray::Ray(glm::vec3 startpoint, glm::vec3 endpoint)
  importance{ importance }, radiance{ 0.0 }, 
  target{ nullptr }, prev{ nullptr }, next{ nullptr } {} //osöker på om next och prev bör initialiserad som nullptr här*********
 
- void Ray::setEndpoint(const float t) { //ray parameterized using t
+ void Ray::setEndpoint(float t) { //ray parameterized using t
 
     endpoint = (startpoint + (direction * t));
  }

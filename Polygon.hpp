@@ -10,9 +10,9 @@ struct Polygon
 
     Polygon() = default; //default constuctor, creates a black material with 0 absoption and 0 emittance
 
-    virtual glm::vec3 CalcUnitNormal(const glm::vec3& hit); //method to compute unit normal, will be overrided in subclasses
+    virtual glm::vec3 CalcUnitNormal(const glm::vec3& hit) = 0; //method to compute unit normal, will be overrided in subclasses
 
-    virtual float rayIntersection(Ray* ray); //method to calculate ray intersection with rect/triangle, overrides in both subclasses.
+    virtual float rayIntersection(Ray* ray) = 0; //method to calculate ray intersection with rect/triangle, overrides in both subclasses.
 };
 
 

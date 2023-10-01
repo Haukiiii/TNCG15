@@ -23,6 +23,6 @@ Ray(glm::vec3 startpoint, glm::vec3 endpoint);
 Ray(glm::vec3 startpoint, glm::vec3 endpoint, double importance);
 
 //
-void setEndpoint(const float t);
+void setEndpoint(float t);
 
 };
