@@ -7,8 +7,24 @@ struct Material {
     double absorption { 0.0 }; //absorption will determine how much light the material absorbs when rays interact with it
     
     //constructors
-    Material();
-    Material(const glm::dvec3& color);
-    Material(const glm::dvec3& color, double emittance); //constructor used when creating material for a light source.
+    Material() : color{ black }{}
+    Material(const glm::dvec3& color) : color{ color }{}
+    Material(const glm::dvec3& color, double emittance) : color{ color }, emittance{ emittance }{} //constructor used when creating material for a light source.
 
+    virtual std::shared_ptr<Ray> BRDF(const std::shared_ptr<Ray> &incoming) const = 0;
+};
+
+//---------------Subclasses of Material---------------//
+struct Mirror: public Material{
+
+    Mirror() : Material(black) {}
+
+    std::shared_ptr<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override;
+};
+
+struct LightSource: public Material {
+
+    LightSource(const glm::dvec3 color, double emittance) : Material(color, emittance){}
+
+    std::shared_ptr<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override;
 };

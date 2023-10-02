@@ -70,7 +70,10 @@
         "compare": "cpp",
         "concepts": "cpp",
         "algorithm": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "deque": "cpp",
+        "fstream": "cpp",
+        "stack": "cpp"
     },
     "cmake.configureOnOpen": false, //löste ev något....
     "cmake.sourceDirectory": "/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15", //var /glm med innan

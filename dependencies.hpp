@@ -27,6 +27,8 @@
 #include <thread>
 
 //settings
+constexpr float RAY_OFFSET = 1e-3f; //used to avoid self-intersections when tracing reflected rays
+constexpr int MAX_RAYS_IN_LIST = 12;  
 constexpr float treshold_importance = 0.1f;
 
 constexpr size_t res = 800; //resolution of the image (res*res)
