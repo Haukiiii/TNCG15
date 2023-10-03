@@ -13,6 +13,8 @@ struct Polygon
     virtual glm::vec3 CalcUnitNormal(const glm::vec3& hit) = 0; //method to compute unit normal, will be overrided in subclasses
 
     virtual float rayIntersection(Ray* ray) = 0; //method to calculate ray intersection with rect/triangle, overrides in both subclasses.
+
+    virtual std::shared_ptr<Ray> generateShadowRays(const glm::vec3& start) = 0;
 };
 
 
@@ -29,6 +31,8 @@ struct Triangle: public Polygon
     glm::vec3 CalcUnitNormal(const glm::vec3& hit) override;
 
     float rayIntersection(Ray* ray) override; //method for calulating ray intersection with triangle, returns the parameter t which determines a point on a ray
+
+    std::shared_ptr<Ray> generateShadowRays(const glm::vec3& start) override;
 };
 
 struct Rectangle: public Polygon
@@ -43,6 +47,8 @@ struct Rectangle: public Polygon
     Rectangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& v4, const Material* material);
     
     glm::vec3 CalcUnitNormal(const glm::vec3& hit) override;
+
+    std::shared_ptr<Ray> generateShadowRays(const glm::vec3& start) override; // kanske onädig då vi bara använder triagnlar?
 
     float rayIntersection(Ray* ray) override; //method for calulating ray intersection with rectangle, returns the parameter t which determines a point on a ray
 };
