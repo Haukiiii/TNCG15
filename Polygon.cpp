@@ -94,3 +94,17 @@ float Rectangle::rayIntersection(Ray* ray){ //************OSÄKER PÅ DENNA*****
 
     return -1.0f; // No intersection in both triangles
 }
+
+std::shared_ptr<Ray> Triangle::generateShadowRays(const glm::vec3& start)
+{
+    std::shared_ptr<Ray> shadowRays;
+  
+    return shadowRays;
+}
+
+std::shared_ptr<Ray> Rectangle::generateShadowRays(const glm::vec3& start)
+{
+    std::shared_ptr<Ray> shadowRays;
+   
+    return shadowRays;
+}
