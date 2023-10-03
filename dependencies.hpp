@@ -28,8 +28,12 @@
 
 //settings
 constexpr float RAY_OFFSET = 1e-3f; //used to avoid self-intersections when tracing reflected rays
+constexpr int DIFF_BOUNCES = 1;
 constexpr int MAX_RAYS_IN_LIST = 12;  
 constexpr float treshold_importance = 0.1f;
+
+constexpr double g_color_contribution = 0.3; // vet inte riktigt vad denna är till för 
+
 
 constexpr size_t res = 800; //resolution of the image (res*res)
 constexpr int samples = 4;
