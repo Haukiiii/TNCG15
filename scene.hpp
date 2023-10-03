@@ -4,6 +4,7 @@
 struct Scene {
 
     std::vector<Polygon*> polygons; //stores all geometry
+    std::vector<Polygon*> ligths;
 
     void addPolygon(Polygon* pol);
 
@@ -13,4 +14,7 @@ struct Scene {
     void rayTarget(Ray& ray) const; 
     
     void traceRay(std::shared_ptr<Ray>& root) const;
+
+    // test
+    glm::dvec3 localLighting(Ray& ray) const;
 };
