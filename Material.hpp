@@ -15,9 +15,20 @@ struct Material {
 };
 
 //---------------Subclasses of Material---------------//
+struct Diffuse : public Material {
+
+    double reflectance;
+
+    Diffuse() : Material{ black } {};
+    Diffuse(const glm::dvec3& color) : Material{ color } {}
+
+    std::shared_ptr<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const override;
+};
+
+
 struct Mirror: public Material{
 
-    Mirror() : Material(black) {}
+    Mirror();
 
     std::shared_ptr<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override;
 };
