@@ -17,7 +17,7 @@ Ray::Ray(glm::vec3 startpoint, glm::vec3 endpoint)
     endpoint = (startpoint + (direction * t));
  }
 
- bool Ray::countRays(){
+ int Ray::countRays(){
    int count{0};
 
    std::shared_ptr<Ray> current = shared_from_this(); // Create a shared_ptr from 'this'
@@ -26,8 +26,5 @@ Ray::Ray(glm::vec3 startpoint, glm::vec3 endpoint)
          count++;
          current = current->next;
       }
-      if(count > MAX_RAYS_IN_LIST){
-         return false;
-      }
-      return true;
+      return count;
  }

@@ -26,7 +26,7 @@ Rectangle::Rectangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& 
     normal = glm::normalize(glm::cross(edge2, edge1));
 }
 
-//functions to get the normals of each shape
+//--------functions to get the normals of each shape--------//
 glm::vec3 Triangle::CalcUnitNormal(const glm::vec3& hit)
 {
 	return glm::normalize(glm::cross(this->edge1, this->edge2));
@@ -37,7 +37,7 @@ glm::vec3 Rectangle::CalcUnitNormal(const glm::vec3& hit)
 	return glm::normalize(glm::cross(this->edge1, this->edge2));
 }
 
-//Ray intersections implementations (möller trumbore)
+//----------Ray intersections implementations (möller trumbore)-------------//
 float Triangle::rayIntersection(Ray* ray){ //lecture 4 möller trumbore 
 
     //check if intersection is possible (scalar product between raydirection and surface normal must be negative)
@@ -63,7 +63,7 @@ float Triangle::rayIntersection(Ray* ray){ //lecture 4 möller trumbore
     return intersection.x; //return the parameter (t) value along the ray where the intersection occurs
 }
 
-float Rectangle::rayIntersection(Ray* ray){ //************OSÄKER PÅ DENNA*************
+float Rectangle::rayIntersection(Ray* ray){ //************OSÄKER PÅ DENNA*************(används inte oavsett)
 
     // Check if intersection is possible
     if (glm::dot(ray->direction, normal) > 0.0f) {

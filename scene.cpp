@@ -4,7 +4,7 @@
         polygons.push_back(pol);
     }
 
-
+    //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
     void Scene::rayTarget(Ray& ray) const{
 
         float closest_pol = std::numeric_limits<double>::max();
@@ -19,10 +19,48 @@
         }
     }
     
-    void Scene::traceRay(std::shared_ptr<Ray>& root) const {
-        std::shared_ptr<Ray> current_pol = root;
+    void Scene::traceRay(std::shared_ptr<Ray>& head) const {
+        std::shared_ptr<Ray> currentRay = head;
+        while(true)
+        {
+            //No reflections --> generate reflection rays
+            if(currentRay->next == nullptr){
+                this->rayTarget(*currentRay); //get closest intersection
+                if(currentRay->target == nullptr) {break;} //avoid bug..?
 
-        while(true){
+                currentRay->next = currentRay->target->material->BRDF(currentRay); //ray generated based on the material's BRDF
+                //currentRay->next->prev = std::make_shared<Ray>(currentRay); //link nodes (kanske inte behövs?)****
+            }   
+            else //currentRay has reflections, can be intermidiate node in the list.
+            {
+                bool evaluate{true};
+                while(currentRay != nullptr) {
+                    if(currentRay->next != nullptr) { //currentRay needs evaluation
+                        currentRay = currentRay->next; //move along the list of rays
+                        evaluate = false;
+                        break;
+                    }
+                }
+
+                if(evaluate) {
+                    while(currentRay->next != nullptr){
+                        currentRay->radiance += currentRay->next->radiance;
+                        currentRay = currentRay->next; 
+                        currentRay->next.reset();
+                    }
+                    if(currentRay == nullptr){
+                        currentRay.reset();
+                        break;
+                    }
+                    currentRay = currentRay->prev;
+                }
+                
+            }
+        }
+    }
+
+
+      /*   while(true){
             if(current_pol->importance < treshold_importance){
                 this ->rayTarget(*current_pol);
                 if (current_pol->target == nullptr) break;
@@ -30,11 +68,9 @@
 
                 // add ray gets color from material and add to radiance
             }
-        }
+        } */
 
         // TODO add else if and else statement 
-
-    }
 
     /*
     void Scene::traceRay(std::shared_ptr<Ray>& root) const

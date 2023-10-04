@@ -25,6 +25,6 @@ Ray(glm::vec3 startpoint, glm::vec3 endpoint, double importance);
 //
 void setEndpoint(float t);
 
-bool countRays();//returns true if amount of rays in list is less than MAX_RAYS_IN_LIST
+int countRays(); //returns number of rays in list of current ray. 
 //Alternativt lägg till en count variabel i ray som håller koll på antalet rays i listan...?
 };

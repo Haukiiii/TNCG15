@@ -8,13 +8,10 @@ struct Scene {
 
     void addPolygon(Polygon* pol);
 
-    //TODO add functions for ligthning 
-
-    //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
-    void rayTarget(Ray& ray) const; 
+    void rayTarget(Ray& ray) const;  //sets the 'target' variable for the input ray.
     
     void traceRay(std::shared_ptr<Ray>& root) const;
 
     // test
-    glm::dvec3 localLighting(Ray& ray) const;
+    glm::dvec3 localLighting(const Ray& ray) const;
 };

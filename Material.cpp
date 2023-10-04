@@ -1,29 +1,24 @@
 #include "dependencies.hpp"
 
+//--------------BRDF IMPLEMENTATION--------------//
 std::shared_ptr<Ray> Mirror::BRDF(const std::shared_ptr<Ray> &incomingRay) const {
 
 	double importance_reflected{0.0};
 	//count all rays in the list of the incoming ray, if rays in list > MAX_RAYS_IN_LIST set importance 0.
-	if(incomingRay->countRays()) {
+	if(incomingRay->countRays() < MAX_RAYS_IN_LIST) {
 		importance_reflected = incomingRay->importance;
 	}
 	
-
 	Ray outgoingRay{ incomingRay->endpoint + incomingRay->target->CalcUnitNormal(incomingRay->endpoint) * RAY_OFFSET,	// Startpoint with slight offset
 					glm::normalize(glm::reflect(incomingRay->endpoint, incomingRay->target->CalcUnitNormal(incomingRay->endpoint))),	// Perfect reflection (importance in = importance out)
 					importance_reflected };
 
 	
-	outgoingRay.prev = incomingRay; //set outgoingRay->prev to point to incomingRay.
+	//outgoingRay.prev = incomingRay; //set outgoingRay->prev to point to incomingRay.
 	incomingRay->next = std::make_shared<Ray>(outgoingRay); //set incomingRay->next to point to outgoingRay.
 
 	return incomingRay->next;
 
-}
-
-Mirror::Mirror()
-{
-    this->absorption = 0.0;
 }
 
 std::shared_ptr<Ray> Diffuse::BRDF(const std::shared_ptr<Ray>& incomingRay) const {
@@ -68,12 +63,12 @@ std::shared_ptr<Ray> Diffuse::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
     return reflected;
 }
 
-
-
 std::shared_ptr<Ray> LightSource::BRDF(const std::shared_ptr<Ray>& incomingRay) const {
-    double reflected_importance = 0.0;
+    double reflected_importance = 0.0; 
 
-    Ray stopped{ incomingRay->endpoint, glm::normalize(glm::reflect(incomingRay->endpoint, incomingRay->target->CalcUnitNormal(incomingRay->endpoint))), reflected_importance };
+    Ray stopped{ incomingRay->endpoint, // outgoing ray (stopped) starts at the same point where the incoming ray ends.
+                glm::normalize(glm::reflect(incomingRay->endpoint, incomingRay->target->CalcUnitNormal(incomingRay->endpoint))), 
+                reflected_importance };
 
     // Create a shared_ptr to hold the stopped ray
     std::shared_ptr<Ray> result = std::make_shared<Ray>(stopped);

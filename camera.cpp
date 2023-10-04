@@ -43,11 +43,20 @@ void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t
                 glm::vec3 interSectionPixel(0.0f, xPixelOffset, yPixelOffset); //The point in the cameraplane where the ray "ends"
                 Ray ray{start, interSectionPixel}; 
 
-                scene.rayTarget(ray); //this gives sets endpoint of the ray, which intersects the closest object, surface intersection information stored in ray->target
-                if(ray.target != nullptr){ //undvik eventuella nullptr, ska inte förekomma egentligen men verkar göra det?...
-                    p.pixelColor = ray.target->material->color;
-                }
+                scene.rayTarget(ray); //this sets endpoint of the ray, which intersects the closest object, surface intersection information stored in ray->target
+                
+                std::shared_ptr<Ray> ray_ptr = std::make_shared<Ray>(ray);
 
+                scene.traceRay(ray_ptr);
+
+                p.pixelColor += ray_ptr->radiance / static_cast<double>(samples);
+				ray_ptr.reset();
+
+                /* if(ray.target != nullptr){ //undvik eventuella nullptr, ska inte förekomma egentligen men verkar göra det?...
+        
+                    p.pixelColor = ray.target->material->color;
+                } */
+                
                
             }
         }
