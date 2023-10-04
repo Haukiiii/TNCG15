@@ -78,5 +78,5 @@
     "cmake.configureOnOpen": false, //löste ev något....
     "cmake.sourceDirectory": "/Users/kentonlarsson/Desktop/TNCG15-Renderer/TNCG15", //var /glm med innan
     "C_Cpp.default.cppStandard": "c++20",
-    "C_Cpp.errorSquiggles": "disabled"
+    
 }
