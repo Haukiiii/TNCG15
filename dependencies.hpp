@@ -27,13 +27,13 @@
 #include <thread>
 
 //settings
-constexpr float RAY_OFFSET = 1e-3f; //used to avoid self-intersections when tracing reflected rays
-constexpr int DIFF_BOUNCES = 1;
-constexpr int MAX_RAYS_IN_LIST = 12; 
-constexpr float treshold_importance = 0.1f;
-
-constexpr double g_color_contribution = 0.3; // vet inte riktigt vad denna är till för 
-
+constexpr float RAY_OFFSET = 1e-3f; // Used to avoid self-intersections when tracing reflected rays
+constexpr float AMOUNT_SHADOWRAYS = 1; // Multiple shadowrays can generate 'soft shadows'
+constexpr int DIFF_BOUNCES = 1; // Amount of sampled diffuse bounces
+constexpr int MAX_DEPTH = 12; // Maximum depth of a ray tree 
+constexpr float IMPORTANCE_THRESHOLD = 0.1f; // Rays with importance below threshold will be discarded
+constexpr float MAX_ABS = 0.8f; // Can vary widely depending on the material you are simulating. For common materials, it might range from 0.1 to 10. Materials with higher absorption coefficients will appear darker and more absorbent.
+constexpr float MIN_ABS = 0.01f; // Should be close to 0, a very small positive number for materials that you want to appear bright and reflective, such as diffuse materials with little absorption.
 
 constexpr size_t res = 800; //resolution of the image (res*res)
 constexpr int samples = 4;

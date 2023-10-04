@@ -6,9 +6,10 @@ Room::Room() {
 
 void Room::create_Room() {
 	
-	//create the camera with eye in position (-1, 0, 0)
+	std::cout << "----Creating camera----" << std::endl;
 	Camera camera(glm::vec3(-1.0, 0.0, 0.0));
-	//create the scene
+
+	std::cout << "----Creating scene----" << std::endl;
 	Scene scene;
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
 	
@@ -31,12 +32,13 @@ void Room::create_Room() {
 	const glm::vec3 P11{10.0f, 6.0f, -5.0f};
 
 	//Materials
+	std::cout << "----Creating materials----" << std::endl;
 	Diffuse wallMaterial{red, 0.2};
 	Diffuse floorMaterial{green, 0.2};
 	Diffuse ceilingMaterial{blue, 0.2};
 	Mirror mirror{};
 	
-
+	std::cout << "----Setting up the room----" << std::endl;
 	Triangle wall11{P0, P1, P6, &wallMaterial};
 	Triangle wall12{P1, P7, P6, &wallMaterial};
 
@@ -65,7 +67,8 @@ void Room::create_Room() {
 	Triangle floor2{P7, P8, P11, &floorMaterial};
 	Triangle floor3{P8, P9, P11, &floorMaterial};
 	Triangle floor4{P9, P10, P11, &floorMaterial};
-
+	
+	std::cout << "----Populating scene----" << std::endl;
 	scene.addPolygon(&wall11);
 	scene.addPolygon(&wall12);
 	scene.addPolygon(&wall21);
@@ -87,7 +90,7 @@ void Room::create_Room() {
 	scene.addPolygon(&floor3);
 	scene.addPolygon(&floor4);
 
-	std::cout << "Rendering scene\n";
+	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
 	camera.render(scene, 0, res, 0, res);
 

@@ -3,28 +3,16 @@
 //constructor using start/endpoint, importance initialized with 1.0
 Ray::Ray(glm::vec3 startpoint, glm::vec3 endpoint) 
 : startpoint{ startpoint }, endpoint{ endpoint }, direction{glm::normalize( endpoint- startpoint)},
- importance{ 1.0 }, radiance{ 0.0 }, 
- target{ nullptr }, prev{ nullptr }, next{ nullptr } {}
+ importance{ 1.0 }, radiance{ black }, 
+ target{ nullptr }, parent{ nullptr } {}
 
 //constructor using start/endpoint and importance.
  Ray::Ray(glm::vec3 startpoint, glm::vec3 direction, double importance) 
 : startpoint{ startpoint }, endpoint{ glm::vec3(0.0f, 0.0f, 0.0f)}, direction{glm::normalize(direction)},
- importance{ importance }, radiance{ 0.0 }, 
- target{ nullptr }, prev{ nullptr }, next{ nullptr } {} //osöker på om next och prev bör initialiserad som nullptr här*********
+ importance{ importance }, radiance{ black }, 
+ target{ nullptr }, parent{ nullptr } {} //kanske inte behöver göra parent t nullptr här***
 
  void Ray::setEndpoint(float t) { //ray parameterized using t
 
     endpoint = (startpoint + (direction * t));
- }
-
- int Ray::countRays(){
-   int count{0};
-
-   std::shared_ptr<Ray> current = shared_from_this(); // Create a shared_ptr from 'this'
-
-      while (current != nullptr) {
-         count++;
-         current = current->next;
-      }
-      return count;
  }

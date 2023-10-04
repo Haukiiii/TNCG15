@@ -14,7 +14,7 @@ struct Polygon
 
     virtual float rayIntersection(Ray* ray) = 0; //method to calculate ray intersection with rect/triangle, overrides in both subclasses.
 
-    virtual std::shared_ptr<Ray> generateShadowRays(const glm::vec3& start) = 0;
+    virtual std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const = 0;
 };
 
 
@@ -32,7 +32,7 @@ struct Triangle: public Polygon
 
     float rayIntersection(Ray* ray) override; //method for calulating ray intersection with triangle, returns the parameter t which determines a point on a ray
 
-    std::shared_ptr<Ray> generateShadowRays(const glm::vec3& start) override;
+    std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override; //generates shadowrays with random endpoint on triangular lightsource
 };
 
 struct Rectangle: public Polygon
@@ -48,7 +48,7 @@ struct Rectangle: public Polygon
     
     glm::vec3 CalcUnitNormal(const glm::vec3& hit) override;
 
-    std::shared_ptr<Ray> generateShadowRays(const glm::vec3& start) override; // kanske onädig då vi bara använder triagnlar?
+    std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override; // kanske onädig då vi bara använder triagnlar?
 
     float rayIntersection(Ray* ray) override; //method for calulating ray intersection with rectangle, returns the parameter t which determines a point on a ray
 };

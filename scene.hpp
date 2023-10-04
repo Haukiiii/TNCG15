@@ -10,8 +10,7 @@ struct Scene {
 
     void rayTarget(Ray& ray) const;  //sets the 'target' variable for the input ray.
     
-    void traceRay(std::shared_ptr<Ray>& root) const;
+    void traceRay(std::shared_ptr<Ray>& rootRay) const; //traverse tree structure and trace all rays to compute radiance contribution 
 
-    // test
-    glm::dvec3 localLighting(const Ray& ray) const;
+    glm::dvec3 localLighting(const Ray& incomingRay) const;
 };

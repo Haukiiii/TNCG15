@@ -95,16 +95,23 @@ float Rectangle::rayIntersection(Ray* ray){ //************OSÄKER PÅ DENNA*****
     return -1.0f; // No intersection in both triangles
 }
 
-std::shared_ptr<Ray> Triangle::generateShadowRays(const glm::vec3& start)
+// Generate rays that hits random point on the triangular light source
+std::vector<Ray> Triangle::generateShadowRays(const glm::vec3& startpoint) const
 {
-    std::shared_ptr<Ray> shadowRays;
-  
-    return shadowRays;
+	std::vector<Ray> shadowrays;
+	for (int i = 0; i < AMOUNT_SHADOWRAYS; ++i) {
+        //generate random barycentric coordinates
+		float u = static_cast<float>(rand() / RAND_MAX);
+		float v = (1.0f - u) * (static_cast<float>(rand())) / RAND_MAX;
+		glm::vec3 endpoint = vertices[0] * (1.0f - u - v) + vertices[1] * u + vertices[2] * v; // random point on triangular lightsource as endpoint. 
+		shadowrays.push_back(Ray{ startpoint, endpoint });
+	}
+	return shadowrays;
 }
 
-std::shared_ptr<Ray> Rectangle::generateShadowRays(const glm::vec3& start)
+std::vector<Ray> Rectangle::generateShadowRays(const glm::vec3& startpoint) const
 {
-    std::shared_ptr<Ray> shadowRays;
+    std::vector<Ray> shadowrays;
    
-    return shadowRays;
+    return shadowrays;
 }
