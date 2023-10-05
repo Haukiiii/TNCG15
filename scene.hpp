@@ -4,9 +4,11 @@
 struct Scene {
 
     std::vector<Polygon*> polygons; //stores all geometry
-    std::vector<Polygon*> ligths;
+    std::vector<Polygon*> lights;
 
-    void addPolygon(Polygon* pol);
+    void addPolygon(Polygon* pol){ polygons.push_back(pol); }
+
+    void addLightSource(Polygon* light) { polygons.push_back(light); lights.push_back(light); }
 
     void rayTarget(Ray& ray) const;  //sets the 'target' variable for the input ray.
     

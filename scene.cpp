@@ -1,15 +1,12 @@
 #include "dependencies.hpp"
 
-    void Scene::addPolygon(Polygon* pol){
-        polygons.push_back(pol);
-    }
-
     //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
     void Scene::rayTarget(Ray& ray) const{
-
+        
         float closest_pol = std::numeric_limits<double>::max();
 
         for(Polygon* pol : this->polygons){
+            
             float X_intersection = pol->rayIntersection(&ray); //is -1.0 if there is no intersection (see rayIntersection)
             if(X_intersection > 0.0f && X_intersection < closest_pol){
                 closest_pol = X_intersection;
@@ -88,23 +85,57 @@
 
         if(incomingRay.target == nullptr) { return terminalRadiance; } //fixes bug when occasionally target is null.******
 
-        //Target is a lightsource
+        // If target is a lightsource simply return color of material
         if(incomingRay.target->material->emittance != 0.0) {
-            return incomingRay.target->material->color; //return color of material
+            return incomingRay.target->material->color; 
         }
 
-        for(Polygon* l : ligths)
+        for(Polygon* l : lights)
         {
             glm::dvec3 lightRadiance{ black };
 
             glm::vec3 startShadow = incomingRay.endpoint + incomingRay.target->CalcUnitNormal(incomingRay.endpoint) * RAY_OFFSET; //startpoint of shadow is the incomingRay endpoint with slight offset to avoid intersection with target
-		    std::vector<Ray> shadowrays = l->generateShadowRays(startShadow);
+		    std::vector<Ray> shadowrays = l->generateShadowRays(startShadow); //generate shadowray(s)
 
-            //TODO for loop check occlusions
+            //check occlusions by comparing distance to lightsource with distance to closest object in the scene, ignoring other light and transparent objects.
+            for(Ray& r : shadowrays) {
 
+                bool lightOccluded{false}; 
+
+                float lightDistance{glm::length(r.direction)}; //TODO vid error ändra direction till endpoint-startpoint
+
+                for(Polygon* geometry : polygons) //check if any geometry in the scene occludes the lightsource
+                {
+                    Ray compare{r}; //copy shadowray for comparison
+
+                    //make sure other lightsources and transparent objects are ignored 
+                    if(dynamic_cast<const LightSource*>(geometry->material) == nullptr) //(****TODO ADD TRANSPARENT WHEN IT EXITS*****)
+                    {
+                        float intersection{geometry->rayIntersection(&r)};
+                        compare.setEndpoint(intersection);
+
+                        if(intersection > epsilon && lightDistance > glm::length(compare.direction)) { //TODO vid error ändra direction till endpoint-startpoint
+                            lightOccluded = true;
+                            break;
+                        }   
+                    }
+                }
+                if(!lightOccluded) 
+                {
+                // determinine how much of the incoming light contributes to the radiance at point
+                double beta = glm::dot(-r.direction, l->CalcUnitNormal(r.endpoint)); // how well-aligned shadow ray direction is with the light source's surface normal.
+				double alpha = glm::dot(incomingRay.target->CalcUnitNormal(incomingRay.endpoint), r.direction); // how well-aligned the surface normal is with the shadow ray direction
+				double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
+				cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
+
+				double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
+
+				lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
+			
+                }
+
+            }
+            terminalRadiance += (lightRadiance / static_cast<double>(shadowrays.size()));
         }
-
-
-
-        return black;
+        return terminalRadiance * incomingRay.target->material->color;
     }
