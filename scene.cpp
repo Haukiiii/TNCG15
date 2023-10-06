@@ -25,8 +25,10 @@
             // Stop rays of importance below threshold
             if(currentRay->importance < IMPORTANCE_THRESHOLD)
             {
-                currentRay->is_leaf = true;
                 rayTarget(*currentRay);
+
+                currentRay->is_leaf = true;
+                
                 currentRay->radiance = localLighting(*currentRay);
                 currentRay = currentRay->parent; //move up the tree
             }
@@ -52,9 +54,12 @@
                 // If at least one child needs computing, select the first one and sets currentRay to that child, effectively descending further down the tree.
                 for(std::shared_ptr<Ray>& c : currentRay->children) 
                 {
-                    currentRay = c;
-                    doCompute = false;
-                    break;
+                    if(!c->is_leaf)
+                    {
+                        currentRay = c;
+                        doCompute = false;
+                        break;
+                    }
                 }
                 if(doCompute)
                 {

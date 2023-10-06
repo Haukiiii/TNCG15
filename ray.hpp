@@ -1,7 +1,7 @@
 #pragma once
 #include "dependencies.hpp"
 
-struct Ray : public std::enable_shared_from_this<Ray>{ //to use share_from_this() in countRays().
+struct Ray { 
 
 glm::vec3 startpoint;
 glm::vec3 endpoint;
@@ -21,7 +21,7 @@ std::vector<std::shared_ptr<Ray>> children; //vector with all child-nodes of the
 //constructors
 Ray() = default;
 Ray(glm::vec3 startpoint, glm::vec3 endpoint);
-Ray(glm::vec3 startpoint, glm::vec3 endpoint, double importance);
+Ray(glm::vec3 startpoint, glm::vec3 direction, double importance);
 
 void setEndpoint(float t); //sets endpoint of the ray using parameter t
 

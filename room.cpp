@@ -31,12 +31,19 @@ void Room::create_Room() {
 	const glm::vec3 P10{13.0f, 0.0f, -5.0f};
 	const glm::vec3 P11{10.0f, 6.0f, -5.0f};
 
+	//light
+	const glm::vec3 P12{ 6.0f, 1.0f, -4.8f };
+    const glm::vec3 P13{ 5.0f, -1.0f, -4.8f };
+    const glm::vec3 P14{ 5.0f, 1.0f, -4.8f };
+    const glm::vec3 P15{ 6.0f, -1.0f, -4.8f };
+
 	//Materials
 	std::cout << "----Creating materials----" << std::endl;
 	Diffuse wallMaterial{red, 0.2};
 	Diffuse floorMaterial{green, 0.2};
 	Diffuse ceilingMaterial{blue, 0.2};
 	Mirror mirror{};
+	LightSource light{white, 100};
 	
 	std::cout << "----Setting up the room----" << std::endl;
 	Triangle wall11{P0, P1, P6, &wallMaterial};
@@ -67,6 +74,9 @@ void Room::create_Room() {
 	Triangle floor2{P7, P8, P11, &floorMaterial};
 	Triangle floor3{P8, P9, P11, &floorMaterial};
 	Triangle floor4{P9, P10, P11, &floorMaterial};
+
+	Triangle light1{ P13, P12, P14, &light };
+    Triangle light2{ P15, P12, P13, &light };
 	
 	std::cout << "----Populating scene----" << std::endl;
 	scene.addPolygon(&wall11);
@@ -89,6 +99,9 @@ void Room::create_Room() {
 	scene.addPolygon(&floor2);
 	scene.addPolygon(&floor3);
 	scene.addPolygon(&floor4);
+
+	scene.addLightSource(&light1);
+    scene.addLightSource(&light2);
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
