@@ -1,6 +1,6 @@
 #include "dependencies.hpp"
 
-    //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
+ //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
     void Scene::rayTarget(Ray& ray) const{
         
         float closest_pol = std::numeric_limits<double>::max();
@@ -14,6 +14,72 @@
                 ray.setEndpoint(closest_pol);
             }
         }
+    }
+
+    glm::dvec3 Scene::localLighting(const Ray& incomingRay) const {
+
+        glm::dvec3 terminalRadiance{ black };
+
+        if(incomingRay.target == nullptr) { return terminalRadiance; } //fixes bug when occasionally target is null.******
+
+        // If target is a lightsource simply return color of material
+        if(incomingRay.target->material->emittance != 0.0) {
+            return incomingRay.target->material->color; 
+        }
+
+        for(Polygon* l : lights)
+        {
+            glm::dvec3 lightRadiance{ black };
+
+            glm::vec3 startShadow = incomingRay.endpoint + incomingRay.target->CalcUnitNormal(incomingRay.endpoint) * RAY_OFFSET; //startpoint of shadow is the incomingRay endpoint with slight offset to avoid intersection with target
+		    std::vector<Ray> shadowrays = l->generateShadowRays(startShadow); //generate shadowray(s)
+
+            //check occlusions by comparing distance to lightsource with distance to closest object in the scene, ignoring other light and transparent objects.
+            for(Ray& r : shadowrays) {
+
+                bool lightOccluded{false}; 
+
+                float lightDistance{glm::length(r.endpoint - r.startpoint)}; //TODO vid error ändra direction till endpoint-startpoint
+
+                for(Polygon* geometry : polygons) //check if any geometry in the scene occludes the lightsource
+                {
+                    Ray compare{r}; //copy shadowray for comparison
+
+                    //make sure other lightsources and transparent objects are ignored 
+                    //if(geometry->material->emittance == 0.0) //(****TODO ADD TRANSPARENT WHEN IT EXITS*****)
+                    if(dynamic_cast<const LightSource*>(geometry->material) == nullptr)
+                    {
+                        float intersection{geometry->rayIntersection(&r)};
+                        compare.setEndpoint(intersection);
+
+                        if(intersection > epsilon && lightDistance > glm::length(compare.endpoint-compare.startpoint)) { //TODO vid error ändra direction till endpoint-startpoint
+                            lightOccluded = true;
+                            break;
+                        }   
+                    }
+                }
+                if(!lightOccluded) 
+                {
+
+                glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) };
+                glm::vec3 lightNormal { l->CalcUnitNormal(r.endpoint) };
+                
+                // determinine how much of the incoming light contributes to the radiance at point
+                double beta = glm::dot(glm::normalize(-r.direction), lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
+				double alpha = glm::dot(targetNormal, glm::normalize(r.direction)); // how well-aligned the surface normal is with the shadow ray direction
+				double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
+				cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
+
+				double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
+
+				lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
+			
+                }
+
+            }
+            terminalRadiance += (lightRadiance / static_cast<double>(shadowrays.size()));
+        }
+        return terminalRadiance * incomingRay.target->material->color;
     }
     
     void Scene::traceRay(std::shared_ptr<Ray>& rootRay) const{
@@ -66,7 +132,7 @@
                     currentRay->radiance = localLighting(*currentRay);
                     for(std::shared_ptr<Ray>& c : currentRay->children) 
                     {
-                        currentRay->radiance += c->radiance * c->importance / currentRay->importance;  
+                        currentRay->radiance += c->radiance * c->importance / currentRay->importance * 0.8;  
 					    c.reset(); //free memory
                     }
 
@@ -82,65 +148,4 @@
 
             }
         }
-    }
-
-    glm::dvec3 Scene::localLighting(const Ray& incomingRay) const {
-
-        glm::dvec3 terminalRadiance{black};
-
-        if(incomingRay.target == nullptr) { return terminalRadiance; } //fixes bug when occasionally target is null.******
-
-        // If target is a lightsource simply return color of material
-        if(incomingRay.target->material->emittance != 0.0) {
-            return incomingRay.target->material->color; 
-        }
-
-        for(Polygon* l : lights)
-        {
-            glm::dvec3 lightRadiance{ black };
-
-            glm::vec3 startShadow = incomingRay.endpoint + incomingRay.target->CalcUnitNormal(incomingRay.endpoint) * RAY_OFFSET; //startpoint of shadow is the incomingRay endpoint with slight offset to avoid intersection with target
-		    std::vector<Ray> shadowrays = l->generateShadowRays(startShadow); //generate shadowray(s)
-
-            //check occlusions by comparing distance to lightsource with distance to closest object in the scene, ignoring other light and transparent objects.
-            for(Ray& r : shadowrays) {
-
-                bool lightOccluded{false}; 
-
-                float lightDistance{glm::length(r.direction)}; //TODO vid error ändra direction till endpoint-startpoint
-
-                for(Polygon* geometry : polygons) //check if any geometry in the scene occludes the lightsource
-                {
-                    Ray compare{r}; //copy shadowray for comparison
-
-                    //make sure other lightsources and transparent objects are ignored 
-                    if(dynamic_cast<const LightSource*>(geometry->material) == nullptr) //(****TODO ADD TRANSPARENT WHEN IT EXITS*****)
-                    {
-                        float intersection{geometry->rayIntersection(&r)};
-                        compare.setEndpoint(intersection);
-
-                        if(intersection > epsilon && lightDistance > glm::length(compare.direction)) { //TODO vid error ändra direction till endpoint-startpoint
-                            lightOccluded = true;
-                            break;
-                        }   
-                    }
-                }
-                if(!lightOccluded) 
-                {
-                // determinine how much of the incoming light contributes to the radiance at point
-                double beta = glm::dot(-r.direction, l->CalcUnitNormal(r.endpoint)); // how well-aligned shadow ray direction is with the light source's surface normal.
-				double alpha = glm::dot(incomingRay.target->CalcUnitNormal(incomingRay.endpoint), r.direction); // how well-aligned the surface normal is with the shadow ray direction
-				double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
-				cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
-
-				double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
-
-				lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
-			
-                }
-
-            }
-            terminalRadiance += (lightRadiance / static_cast<double>(shadowrays.size()));
-        }
-        return terminalRadiance * incomingRay.target->material->color;
     }

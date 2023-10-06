@@ -24,13 +24,13 @@ std::vector<Ray> Diffuse::BRDF(const std::shared_ptr<Ray>& incomingRay) const {
     //get local coordinates for the surface being shaded by creating orthogonal vectors X,Y,Z
     glm::vec3 Z = incomingRay->target->CalcUnitNormal(incomingRay->endpoint); // surface normal
     glm::vec3 X = glm::normalize(incomingRay->direction - glm::dot(incomingRay->direction, Z) * Z); 
-    glm::vec3 Y = normalize(cross(-X, Z));
+    glm::vec3 Y = glm::normalize(glm::cross(-X, Z));
 
     // Local to World transformation matrix
     glm::mat4 L_2_W{ X.x, X.y, X.z, 0.0f,
-                    Y.x, Y.y, Y.z, 0.0f,
-                    Z.x, Z.y, Z.z, 0.0f,
-                    0.0f, 0.0f, 0.0f, 1.0f };
+                     Y.x, Y.y, Y.z, 0.0f,
+                     Z.x, Z.y, Z.z, 0.0f,
+                     0.0f, 0.0f, 0.0f, 1.0f };
 
     std::vector<Ray> outgoing; // to store outgoing/reflected rays.
 
@@ -43,11 +43,12 @@ std::vector<Ray> Diffuse::BRDF(const std::shared_ptr<Ray>& incomingRay) const {
         float x{cos(phi) * sin(omega)};
         float y{sin(phi) * sin(omega)};
         float z{cos(omega)};
-        glm::vec3 localDirection = glm::vec3(x, y, z);
+        glm::vec3 localDirection{x, y, z};
         // Transform direction to world coordinates
         glm::vec3 worldDirection = glm::inverse(glm::transpose(L_2_W)) * glm::vec4(localDirection, 1.0f);        
 
         double importance_outgoing{0.0};
+
         // Russian Roulette termination for ref
         // Generate random number between [0,1], if greater than the specified absorption, the ray reflection is considered, otherwise reflection is terminated. 
         

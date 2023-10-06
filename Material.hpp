@@ -3,8 +3,8 @@
 
 struct Material {
     glm::dvec3 color;
-    double emittance { 0.0 }; //property of a material to emit light or radiation, used for lightsources.
-    double absorption { 0.0 }; // determines how much light the material absorbs when rays interact with it based on color of material
+    double emittance{ 0.0 }; //property of a material to emit light or radiation, used for lightsources.
+    double absorption{ 0.0 }; // determines how much light the material absorbs when rays interact with it based on color of material
     
     //constructors
     Material() : color{ black }{}
@@ -16,6 +16,14 @@ struct Material {
 
 //---------------Subclasses of Material---------------//
 
+//Mirror material, perfect reflection
+struct Mirror: public Material{
+
+    Mirror() : Material(){}
+
+    std::vector<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override;
+};
+
 //Diffuse Lambertian material
 struct Diffuse : public Material {
 
@@ -26,17 +34,9 @@ struct Diffuse : public Material {
     std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const override;
 };
 
-//Mirror material, perfect reflection
-struct Mirror: public Material{
-
-    Mirror() : Material(){}
-
-    std::vector<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override;
-};
-
 struct LightSource: public Material {
 
-    LightSource(const glm::dvec3 color, double emittance) : Material(color, emittance){}
+    LightSource(const glm::dvec3& color, double emittance) : Material(color, emittance){}
 
     std::vector<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override; //Rays stop at lightsources
 };
