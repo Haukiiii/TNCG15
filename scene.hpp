@@ -10,6 +10,8 @@ struct Scene {
 
     void addLightSource(Polygon* light) { lights.push_back(light); polygons.push_back(light); }
 
+    void addBox(Box* box);
+
     void rayTarget(Ray& ray) const;  //sets the 'target' variable for the input ray.
     
     void traceRay(std::shared_ptr<Ray>& rootRay) const; //traverse tree structure and trace all rays to compute radiance contribution 
