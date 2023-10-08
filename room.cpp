@@ -14,19 +14,25 @@ void Room::create_Room() {
 
 	//Materials
 	std::cout << "----Creating materials----" << std::endl;
-	Diffuse wallMaterial{red, 0.2};
-	Diffuse ceilingMaterial{green, 0.2};
-	Diffuse floorMaterial{blue, 0.2};
+	Diffuse wallMaterial1{lightgray, 0.2}; // Front left
+	Diffuse wallMaterial2{lightgray, 0.2}; // Front right
+	Diffuse wallMaterial3{green, 0.6}; // Center left
+	Diffuse wallMaterial4{red, 0.6}; // Center right
+	Diffuse wallMaterial5{lightgray, 0.2}; // Back left
+	Diffuse wallMaterial6{lightgray, 0.2}; // Back right
+
+	Diffuse ceilingMaterial{lightgray, 0.6};
+	Diffuse floorMaterial{lightgray, 0.2};
+
 	Mirror mirror{};
 	Diffuse boxMaterial{yellow, 0.2};
-	LightSource light{white, 30};
-	Diffuse sphereMaterial{ yellow, 0.2 };
+	Diffuse boxMaterial2{white, 0.8}; //Easier to spot color-bleeding in tests
+	LightSource light{white, 60};
+	Diffuse border{black, 0.2};
+	Diffuse sphereMaterial{ white, 0.2 };
 	Diffuse transparentMaterial{ black, REFLECTIVE_INDEX_GLASS };
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
-
-
-
 
 	// Define the vertices of the BOOOX
 	/* ------- New box function 
@@ -98,7 +104,7 @@ void Room::create_Room() {
 
 	
 
-	//All cordiantes for the room (TODO -> floor and ceiling mixed up for some reason?)
+	//----All cordiantes for the room (TODO -> floor and ceiling mixed up for some reason?)----//
 	// floor
 	const glm::vec3 P0{0.0f, 6.0f, 5.0f};
 	const glm::vec3 P1{-3.0f, 0.0f, 5.0f}; 
@@ -121,12 +127,19 @@ void Room::create_Room() {
     const glm::vec3 P13{ 5.0f, -1.0f, -4.8f };
     const glm::vec3 P14{ 5.0f, 1.0f, -4.8f };
     const glm::vec3 P15{ 6.0f, -1.0f, -4.8f };
-	
-	std::cout << "----Setting up the room----" << std::endl;
 
-	//------TESTAR NYA KOORDINATER-------//
+	//light border
+	const glm::vec3 P17{ 5.0f, 1.0f, 4.8f };
+    const glm::vec3 P18{ 5.0f, 1.0f, 4.8f };
+    const glm::vec3 P19{ 5.0f, -1.0f, 4.8f };
+    const glm::vec3 P20{ 5.0f, -1.0f, 4.8f };
+    const glm::vec3 P21{ 6.0f, 1.0f, 4.8f };
+    const glm::vec3 P22{ 6.0f, 1.0f, 4.8f };
+    const glm::vec3 P23{ 6.0f, -1.0f, 4.8f };
+    const glm::vec3 P24{ 6.0f, -1.0f, 4.8f };
 	
-	// Triangles for the floor (with normals pointing up)
+	std::cout << "----Setting up the room----" << std::endl;	
+	//----Floor (with normals pointing up)----//
 	Triangle floor1{P0, PC, P1, &floorMaterial};
 	Triangle floor2{P1, PC, P2, &floorMaterial};
 	Triangle floor3{P2, PC, P3, &floorMaterial};
@@ -134,7 +147,7 @@ void Room::create_Room() {
 	Triangle floor5{P4, PC, P5, &floorMaterial};
 	Triangle floor6{P5, PC, P0, &floorMaterial};
 
-	// Triangles for the ceiling (with normals pointing down)
+	//----Ceiling (with normals pointing down)----//
 	Triangle ceiling1{P6, P7, PF, &ceilingMaterial};
 	Triangle ceiling2{P7, P8, PF, &ceilingMaterial};
 	Triangle ceiling3{P8, P9, PF, &ceilingMaterial};
@@ -142,27 +155,38 @@ void Room::create_Room() {
 	Triangle ceiling5{P10, P11, PF, &ceilingMaterial};
 	Triangle ceiling6{P11, P6, PF, &ceilingMaterial};
 
-	//------TESTAR NYA KOORDINATER-------//
+	//----Walls----//
+	Triangle wall11{P4, P5, P10, &wallMaterial1}; //Front left wall (closest to camera)
+	Triangle wall12{P5, P11, P10, &wallMaterial1};
 
-	//Triangle yeet{glm::vec3{6.0f, 1.0f, 3.0f}, glm::vec3{4.0f, -4.0f, 3.0f}, glm::vec3{4.0f, 1.0f, 3.0f}, &floorMaterial};
+	Triangle wall21{P0, P1, P6, &wallMaterial2}; //Front right wall (closest to camera)
+	Triangle wall22{P1, P7, P6, &wallMaterial2};
 
-	Triangle wall11{P0, P1, P6, &wallMaterial};
-	Triangle wall12{P1, P7, P6, &wallMaterial};
+	Triangle wall31{P2, P3, P8,  &wallMaterial3}; //Center Left wall
+	Triangle wall32{P3, P9, P8, &wallMaterial3};
 
-	Triangle wall21{P1, P2, P7, &wallMaterial};
-	Triangle wall22{P2, P8, P7, &wallMaterial};
+	Triangle wall41{P5, P0, P11, &wallMaterial4}; //Center right wall
+	Triangle wall42{P0, P6, P11, &wallMaterial4};
 
-	Triangle wall31{P2, P3, P8,  &wallMaterial};
-	Triangle wall32{P3, P9, P8, &wallMaterial};
+	Triangle wall51{P3, P4, P9, &mirror}; //Back left wall (furthest from camera)
+	Triangle wall52{P4, P10, P9, &mirror};
 
-	Triangle wall41{P3, P4, P9, &mirror};
-	Triangle wall42{P4, P10, P9, &mirror};
+	Triangle wall61{P1, P2, P7, &mirror}; //Back right wall (furthest from camera)
+	Triangle wall62{P2, P8, P7, &mirror}; 
 
-	Triangle wall51{P4, P5, P10, &wallMaterial};
-	Triangle wall52{P5, P11, P10, &wallMaterial};
+	//----Lights----//
+	Triangle light1{ P13, P12, P14, &light };
+    Triangle light2{ P15, P12, P13, &light };
 
-	Triangle wall61{P5, P0, P11, &wallMaterial};
-	Triangle wall62{P0, P6, P11, &wallMaterial};
+	//----Light Border----//
+	Triangle triangle21{ P17, P18, P19, &border };
+    Triangle triangle22{ P17, P19, P20, &border };
+    Triangle triangle23{ P17, P21, P18, &border };
+    Triangle triangle24{ P18, P21, P22, &border };
+    Triangle triangle25{ P21, P23, P22, &border };
+    Triangle triangle26{ P21, P24, P23, &border };
+    Triangle triangle27{ P19, P23, P24, &border };
+    Triangle triangle28{ P19, P24, P20, &border };
 
 	// Create triangles for the ceiling and floor
 	/* Triangle floor1{P0, P5, P1, &floorMaterial};
@@ -175,10 +199,7 @@ void Room::create_Room() {
 	Triangle ceiling3{P8, P9, P11, &ceilingMaterial};
 	Triangle ceiling4{P9, P10, P11, &ceilingMaterial}; */
 	
-	Triangle light1{ P13, P12, P14, &light };
-    Triangle light2{ P15, P12, P13, &light };
-	
-	std::cout << "----Populating scene----" << std::endl;
+	std::cout << "----Adding Polygons----" << std::endl;
 	//scene.addPolygon(&yeet);
 	scene.addPolygon(&wall11);
 	scene.addPolygon(&wall12);
@@ -208,27 +229,6 @@ void Room::create_Room() {
 	scene.addLightSource(&light1);
     scene.addLightSource(&light2);
 
-	Diffuse border{ white, 0.2 };
-
-	//light border test if neccesary....*****
-	const glm::vec3 P17{ 5.0f, 1.0f, 4.8f };
-    const glm::vec3 P18{ 5.0f, 1.0f, 5.0f };
-    const glm::vec3 P19{ 5.0f, -1.0f, 5.0f };
-    const glm::vec3 P20{ 5.0f, -1.0f, 4.8f };
-    const glm::vec3 P21{ 6.0f, 1.0f, 4.8f };
-    const glm::vec3 P22{ 6.0f, 1.0f, 5.0f };
-    const glm::vec3 P23{ 6.0f, -1.0f, 5.0f };
-    const glm::vec3 P24{ 6.0f, -1.0f, 4.8f };
-
-    Triangle triangle21{ P17, P18, P19, &border };
-    Triangle triangle22{ P17, P19, P20, &border };
-    Triangle triangle23{ P17, P21, P18, &border };
-    Triangle triangle24{ P18, P21, P22, &border };
-    Triangle triangle25{ P21, P23, P22, &border };
-    Triangle triangle26{ P21, P24, P23, &border };
-    Triangle triangle27{ P19, P23, P24, &border };
-    Triangle triangle28{ P19, P24, P20, &border };
-
    /*  scene.addPolygon(&triangle21);
     scene.addPolygon(&triangle22);
     scene.addPolygon(&triangle23);
@@ -242,10 +242,13 @@ void Room::create_Room() {
 	// add box
 	Box b1 = Box(glm::vec3(5.0f, -3.0f, 4.0f), 2.0f, 1.5f, 1.5f, &boxMaterial);
 	scene.addBox(&b1);
+
+	Box b2 = Box(glm::vec3(7.2f, 2.5f, 2.5f), 5.0f, 1.5f, 1.5f, &boxMaterial2);
+	scene.addBox(&b2);
 	
 	// add sphere
-	Sphere s1{ glm::vec3(5.0f, -3.0f, 1.9f), 1.0f, &transparentMaterial };
-	scene.addPolygon(&s1);
+	//Sphere s1{ glm::vec3(5.0f, -3.0f, 1.9f), 1.0f, &transparentMaterial };
+	//scene.addPolygon(&s1);
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };

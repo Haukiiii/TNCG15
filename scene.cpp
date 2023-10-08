@@ -53,8 +53,8 @@
                     Ray compare{r}; //copy shadowray for comparison
 
                     //make sure other lightsources and transparent objects are ignored 
-                    //if(geometry->material->emittance == 0.0) //(****TODO ADD TRANSPARENT WHEN IT EXITS*****)
-                    if(dynamic_cast<const LightSource*>(geometry->material) == nullptr)
+                    //if(geometry->material->emittance == 0.0)
+                    if(dynamic_cast<const LightSource*>(geometry->material) == nullptr || dynamic_cast<const Transparent*>(geometry->material) == nullptr)
                     {
                         float intersection{geometry->rayIntersection(&r)};
                         compare.setEndpoint(intersection);
