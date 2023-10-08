@@ -217,14 +217,14 @@ void Room::create_Room() {
     Triangle triangle27{ P19, P23, P24, &border };
     Triangle triangle28{ P19, P24, P20, &border };
 
-    scene.addPolygon(&triangle21);
+   /*  scene.addPolygon(&triangle21);
     scene.addPolygon(&triangle22);
     scene.addPolygon(&triangle23);
     scene.addPolygon(&triangle24);
     scene.addPolygon(&triangle25);
     scene.addPolygon(&triangle26);
     scene.addPolygon(&triangle27);
-    scene.addPolygon(&triangle28);
+    scene.addPolygon(&triangle28); */
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
