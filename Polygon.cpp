@@ -27,10 +27,44 @@ Rectangle::Rectangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& 
     normal = glm::normalize(glm::cross(edge1, edge2));
 }
 
+Box::Box(const glm::vec3& pos, float height, float depth, float width, const Material* material)
+{
+    corners[0] = pos + glm::vec3(depth * 0.5f, width * -0.5f, height * 0.5f);
+    corners[1] = pos + glm::vec3(depth * -0.5f, width * -0.5f, height * 0.5f);
+    corners[2] = pos + glm::vec3(depth * -0.5f, width * 0.5f, height * 0.5f);
+    corners[3] = pos + glm::vec3(depth * 0.5f, width * 0.5f, height * 0.5f);
+    corners[4] = pos + glm::vec3(depth * 0.5f, width * -0.5f, height * -0.5f);
+    corners[5] = pos + glm::vec3(depth * -0.5f, width * -0.5f, height * -0.5f);
+    corners[6] = pos + glm::vec3(depth * -0.5f, width * 0.5f, height * -0.5f);
+    corners[7] = pos + glm::vec3(depth * 0.5f, width * 0.5f, height * -0.5f);
+
+    //Top
+    triangles[0] = Triangle(corners[0], corners[3], corners[1], material);
+    triangles[1] = Triangle(corners[1], corners[3], corners[2], material);
+    //Bottom
+    triangles[2] = Triangle(corners[4], corners[5], corners[6], material);
+    triangles[3] = Triangle(corners[4], corners[6], corners[7], material);
+    //Wall 1
+    triangles[4] = Triangle(corners[0], corners[7], corners[3], material);
+    triangles[5] = Triangle(corners[0], corners[4], corners[7], material);
+    //Wall 2
+    triangles[6] = Triangle(corners[0], corners[1], corners[4], material);
+    triangles[7] = Triangle(corners[1], corners[5], corners[4], material);
+    //Wall 3
+    triangles[8] = Triangle(corners[1], corners[2], corners[5], material);
+    triangles[9] = Triangle(corners[2], corners[6], corners[5], material);
+    //Wall 4
+    triangles[10] = Triangle(corners[3], corners[6], corners[2], material);
+    triangles[11] = Triangle(corners[3], corners[7], corners[6], material);
+
+}
+
 //--------functions to get the normals of each shape--------//
 glm::vec3 Triangle::CalcUnitNormal(const glm::vec3& hit) const { return glm::normalize(glm::cross(this->edge1, this->edge2)); }
 
 glm::vec3 Rectangle::CalcUnitNormal(const glm::vec3& hit) const { return glm::normalize(glm::cross(this->edge1, this->edge2)); }
+
+glm::vec3 Sphere::CalcUnitNormal(const glm::vec3& hit) const { return glm::normalize(hit - this->position); }
 
 //----------Ray intersections implementations (möller trumbore)-------------//
 float Triangle::rayIntersection(Ray* ray) const { //lecture 4 möller trumbore 
@@ -93,6 +127,43 @@ float Rectangle::rayIntersection(Ray* ray) const { //************OSÄKER PÅ DEN
     return -1.0f; // No intersection in both triangles
 }
 
+float Sphere::rayIntersection(Ray* ray) const
+{
+    // Follows following theroey viclw17.github.io/2018/07/16/raytracing-ray-sphere-intersection/
+
+       // A = rayStart, B = rayDirection, C = sphereCenter
+       // All dot products for the quadratic formula
+    glm::vec3 dot_prods{};
+
+    dot_prods.x = glm::dot(ray->direction, ray->direction);
+    dot_prods.y = glm::dot(ray->startpoint - this->position, 2.0f * ray->direction);
+    dot_prods.z = glm::dot(ray->startpoint - this->position, ray->startpoint - this->position) - this->radius * this->radius;
+
+    // The dicriminant which check for hits
+    float discriminant = dot_prods.y * dot_prods.y / 4.0f - dot_prods.x * dot_prods.z;
+
+    // If determinant < 0: No hit, If ==0, It scraped along the surface
+    if (discriminant < epsilon) {
+        return -1.0;
+    }
+
+    float numerator_neg = -(dot_prods.y / 2.0f * dot_prods.x) - sqrt(discriminant);
+    float numerator_pos = -(dot_prods.y / 2.0f * dot_prods.x) + sqrt(discriminant);
+
+    numerator_neg = glm::max(numerator_neg, 0.0f);
+    numerator_pos = glm::max(numerator_pos, 0.0f);
+
+    float numerator_true = glm::min(numerator_neg, numerator_pos);
+
+    // Check if hit was behind camera, we dont want that
+    if (numerator_true > epsilon)
+    {
+        return numerator_true;
+    }
+
+    return -1.0f;
+}
+
 // Generate rays that hits random point on the triangular light source
 std::vector<Ray> Triangle::generateShadowRays(const glm::vec3& startpoint) const
 {
@@ -118,3 +189,17 @@ std::vector<Ray> Rectangle::generateShadowRays(const glm::vec3& startpoint) cons
 	}
 	return shadowrays;
 }
+
+std::vector<Ray> Sphere::generateShadowRays(const glm::vec3& start) const
+{
+    std::vector<Ray> shadow_rays;
+    shadow_rays.push_back(Ray{ start, this->position });
+
+    return shadow_rays;
+}
+
+
+
+
+
+
