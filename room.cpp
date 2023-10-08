@@ -20,11 +20,16 @@ void Room::create_Room() {
 	Mirror mirror{};
 	Diffuse boxMaterial{yellow, 0.2};
 	LightSource light{white, 30};
+	Diffuse sphereMaterial{ yellow, 0.2 };
+	Diffuse transparentMaterial{ black, REFLECTIVE_INDEX_GLASS };
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
-	
+
+
+
+
 	// Define the vertices of the BOOOX
-	
+	/* ------- New box function 
 	const glm::vec3 B0(-0.125f, -0.125f, -0.125f); // Bottom-back-left corner
 	const glm::vec3 B1(0.125f, -0.125f, -0.125f);  // Bottom-back-right corner
 	const glm::vec3 B2(0.125f, 0.125f, -0.125f);   // Bottom-front-right corner
@@ -37,8 +42,10 @@ void Room::create_Room() {
 	// Calculate the rotation matrix
 	const float rotationAngle{60};
 	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-	
+	*/
 	// Apply the rotation to each vertex
+
+	/* ------- New box function 
 	const glm::vec3 rotB0 = glm::vec3(rotationMatrix * glm::vec4(B0, 1.0f));
 	const glm::vec3 rotB1 = glm::vec3(rotationMatrix * glm::vec4(B1, 1.0f));
 	const glm::vec3 rotB2 = glm::vec3(rotationMatrix * glm::vec4(B2, 1.0f));
@@ -47,6 +54,8 @@ void Room::create_Room() {
 	const glm::vec3 rotB5 = glm::vec3(rotationMatrix * glm::vec4(B5, 1.0f));
 	const glm::vec3 rotB6 = glm::vec3(rotationMatrix * glm::vec4(B6, 1.0f));
 	const glm::vec3 rotB7 = glm::vec3(rotationMatrix * glm::vec4(B7, 1.0f));
+	
+	
 	Triangle box0{rotB0, rotB1, rotB2, &boxMaterial}; // BOTTOM 
 	Triangle box1{rotB0, rotB2, rotB3, &boxMaterial}; 
 	Triangle box2{rotB4, rotB5, rotB6, &boxMaterial}; // TOP
@@ -59,6 +68,7 @@ void Room::create_Room() {
 	Triangle box9{rotB0, rotB5, rotB4, &boxMaterial}; 
 	Triangle box10{rotB2, rotB6, rotB7, &boxMaterial}; // FRONT
 	Triangle box11{rotB2, rotB7, rotB3, &boxMaterial};  
+	*/
 
 	/* Triangle box0{B0, B1, B2, &boxMaterial}; // BOTTOM 
 	Triangle box1{B0, B2, B3, &boxMaterial}; 
@@ -72,7 +82,7 @@ void Room::create_Room() {
 	Triangle box9{B0, B5, B4, &boxMaterial}; 
 	Triangle box10{B2, B6, B7, &boxMaterial}; // FRONT
 	Triangle box11{B2, B7, B3, &boxMaterial};  
- */
+ 
 	scene.addPolygon(&box1);
 	scene.addPolygon(&box2);
 	scene.addPolygon(&box3);
@@ -84,7 +94,9 @@ void Room::create_Room() {
 	scene.addPolygon(&box9);
 	scene.addPolygon(&box10);
 	scene.addPolygon(&box11);
+*/
 
+	
 
 	//All cordiantes for the room (TODO -> floor and ceiling mixed up for some reason?)
 	// floor
@@ -225,6 +237,15 @@ void Room::create_Room() {
     scene.addPolygon(&triangle26);
     scene.addPolygon(&triangle27);
     scene.addPolygon(&triangle28); */
+
+
+	// add box
+	Box b1 = Box(glm::vec3(5.0f, -3.0f, 4.0f), 2.0f, 1.5f, 1.5f, &boxMaterial);
+	scene.addBox(&b1);
+	
+	// add sphere
+	Sphere s1{ glm::vec3(5.0f, -3.0f, 1.9f), 1.0f, &transparentMaterial };
+	scene.addPolygon(&s1);
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
