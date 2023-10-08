@@ -34,6 +34,15 @@ struct Diffuse : public Material {
     std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const override;
 };
 
+struct Transparent : Material
+{
+    float reflective_index;
+
+    Transparent(const glm::dvec3& color, float index) : Material(color), reflective_index(index) {};
+
+    std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incoming) const override;
+};
+
 struct LightSource: public Material {
 
     LightSource(const glm::dvec3& color, double emittance) : Material(color, emittance){}
