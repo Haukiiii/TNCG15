@@ -16,6 +16,13 @@
         }
     }
 
+    void Scene::addBox(Box* box)
+    {
+        for (size_t i = 0; i < box->triangles.size(); ++i) {
+            addPolygon(&box->triangles[i]);
+        }
+    }
+
     glm::dvec3 Scene::localLighting(const Ray& incomingRay) const {
 
         glm::dvec3 terminalRadiance{ black };
