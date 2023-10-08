@@ -2,7 +2,7 @@
 
 //constructor using start/endpoint, importance initialized with 1.0
 Ray::Ray(glm::vec3 startpoint, glm::vec3 endpoint) 
-: startpoint{ startpoint }, endpoint{ endpoint }, direction{ glm::normalize(endpoint - startpoint )},
+: startpoint{ startpoint }, endpoint{ endpoint }, direction{ glm::normalize(endpoint - startpoint) },
  importance{ 1.0 }, radiance{ black }, 
  target{ nullptr }, parent{ nullptr } {}
 

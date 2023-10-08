@@ -8,6 +8,11 @@ Camera::Camera(glm::vec3 eye) : eye{ eye } {
 	cameraPlane[1][0] = glm::vec3(0.0f, -1.0f, 1.0f); //Top left corner
 	cameraPlane[1][1] = glm::vec3(0.0f, 1.0f, 1.0f); //Top right corner
 
+    //cameraPlane[1][0] = glm::vec3(0.0f, -1.0f, -1.0f); //Bottom left corner
+    //cameraPlane[1][1] = glm::vec3(0.0f, 1.0f, -1.0f); //Bottom right corner
+	//cameraPlane[0][0] = glm::vec3(0.0f, -1.0f, 1.0f); //Top left corner
+	//cameraPlane[0][1] = glm::vec3(0.0f, 1.0f, 1.0f); //Top right corner
+
     pixels = new std::array<Pixel, res*res>(); 
     pixels->fill(Pixel{ glm::dvec3(0.0, 0.0, 0.0) }); //may not be needed (ensure pixels initialized with black)
 }   
@@ -28,7 +33,7 @@ void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t
     for(size_t j = yLowerBound; j < yUpperBound; ++j) {
         for(size_t i = xLowerBound; i < xUpperBound; ++i) {
             Pixel& p = getPixel(i, j);
-            std::cout << "PIXEL ROW: " << i << " COLUMN: " << j << std::endl;//testing*****
+            std::cout << "PIXEL COLUMN: " << j << std::endl;//testing*****
             for(size_t k = 0; k < samples; ++k) { // generate multiple samples within each pixel
 
                 // Calculate coordinates of the sub-sample within the pixel (cordinates on the camera plane)

@@ -27,7 +27,7 @@
             return incomingRay.target->material->color; 
         }
 
-        for(Polygon* l : lights)
+        for(Polygon* l : lights) //generate shadowrays going to all lightsources 
         {
             glm::dvec3 lightRadiance{ black };
 
@@ -52,7 +52,7 @@
                         float intersection{geometry->rayIntersection(&r)};
                         compare.setEndpoint(intersection);
 
-                        if(intersection > epsilon && lightDistance > glm::length(compare.endpoint-compare.startpoint)) { //TODO vid error ändra direction till endpoint-startpoint
+                        if(intersection > epsilon && lightDistance > glm::length(compare.endpoint - compare.startpoint)) { //TODO vid error ändra direction till endpoint-startpoint
                             lightOccluded = true;
                             break;
                         }   
@@ -62,11 +62,11 @@
                 {
 
                 glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) };
-                glm::vec3 lightNormal { l->CalcUnitNormal(r.endpoint) };
+                glm::vec3 lightNormal { l->CalcUnitNormal(incomingRay.endpoint) };
                 
                 // determinine how much of the incoming light contributes to the radiance at point
-                double beta = glm::dot(glm::normalize(-r.direction), lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
-				double alpha = glm::dot(targetNormal, glm::normalize(r.direction)); // how well-aligned the surface normal is with the shadow ray direction
+                double beta = glm::dot(r.direction, -lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
+				double alpha = glm::dot(targetNormal, r.direction); // how well-aligned the surface normal is with the shadow ray direction
 				double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
 				cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
 
@@ -74,6 +74,10 @@
 
 				lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
 			
+                }
+                else {
+                    //std::cout << "Occlusion occuring" << std::endl; // debugging***
+                    //std::cout << "R: " << incomingRay.target->material->color.r << "G: " << incomingRay.target->material->color.g << "B: " << incomingRay.target->material->color.b << std::endl;
                 }
 
             }

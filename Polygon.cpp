@@ -42,9 +42,9 @@ float Triangle::rayIntersection(Ray* ray) const { //lecture 4 möller trumbore
     //} // this does not work for some reason...
  
     //define T, P, Q, already have D, E1, E2
-    glm::vec3 T = ray->startpoint - vertices[0];
+    glm::vec3 T = (ray->startpoint - vertices[0]);
     glm::vec3 D = ray->direction;
-    glm::vec3 P = glm::cross(ray->direction, edge2);
+    glm::vec3 P = glm::cross(D, edge2);
     glm::vec3 Q = glm::cross(T, edge1); 
 
     //calculate barycentric coordinates of the intersection point
