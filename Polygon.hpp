@@ -52,3 +52,26 @@ struct Rectangle: public Polygon
 
     float rayIntersection(Ray* ray) const override; //method for calulating ray intersection with rectangle, returns the parameter t which determines a point on a ray
 };
+
+struct Sphere : public Polygon {
+
+    glm::vec3 position;
+    float radius;
+
+    Sphere(const glm::vec3& pos, float rad, const Material* material)
+        : Polygon{ material }, position{ pos }, radius{ rad } {};
+
+    float rayIntersection(Ray* ray) const override;
+    std::vector<Ray> generateShadowRays(const glm::vec3& start) const override;
+    glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override;
+};
+
+struct Box : public Triangle {
+
+    std::array<glm::vec3, 8> corners;
+    std::array<Triangle, 12> triangles;
+
+    Box() = default;
+    Box(const glm::vec3& pos, float height, float depth, float width, const Material* material);
+};
+
