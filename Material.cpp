@@ -1,5 +1,7 @@
 #include "dependencies.hpp"
 
+
+
 //--------------BRDF IMPLEMENTATION--------------//
 
 std::vector<Ray> Mirror::BRDF(const std::shared_ptr<Ray> &incomingRay) const {
@@ -81,3 +83,59 @@ std::vector<Ray> LightSource::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 }
 
 
+std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incoming) const
+{
+	double reflected_importance{ 0.0 };
+	double refracted_importance{ 0.0 };
+
+	glm::vec3 N = incoming->inside_transparent_object ? -incoming->target->CalcUnitNormal(incoming->endpoint) : incoming->target->CalcUnitNormal(incoming->endpoint);
+	glm::vec3 I = incoming->direction;
+
+	double cos_inc_angle = glm::dot(-I, N);
+	double inc_angle = glm::acos(cos_inc_angle);
+
+	double max_angle = glm::asin(REFLECTIVE_INDEX_AIR / this->reflective_index);
+
+	if (incoming->depth < MAX_DEPTH)
+	{
+
+		if (incoming->inside_transparent_object && inc_angle > max_angle)
+		{
+			reflected_importance = incoming->importance;
+		}
+		else
+		{
+			// Schlicks equation
+			double R0 = incoming->inside_transparent_object ?
+				glm::pow(((this->reflective_index - REFLECTIVE_INDEX_AIR) / (REFLECTIVE_INDEX_AIR + this->reflective_index)), 2.0)
+				: glm::pow(((REFLECTIVE_INDEX_AIR - this->reflective_index) / (REFLECTIVE_INDEX_AIR + this->reflective_index)), 2.0);
+
+			reflected_importance = (R0 + (1.0 - R0) * glm::pow((1.0 - cos_inc_angle), 5.0)) * incoming->importance;
+			refracted_importance = (1.0 - reflected_importance) * incoming->importance;
+		}
+	}
+
+	Ray reflected_ray{ incoming->endpoint + N * RAY_OFFSET,	// Start with offset
+				glm::normalize(glm::reflect(incoming->endpoint, N)),
+				reflected_importance };
+
+	float reflective_ratio = incoming->inside_transparent_object ? this->reflective_index / REFLECTIVE_INDEX_AIR : REFLECTIVE_INDEX_AIR / this->reflective_index;
+	glm::vec3 refracted_direction = reflective_ratio * I + N * (-reflective_ratio * glm::dot(N, I)
+		- glm::sqrt(1.0f - glm::pow(reflective_ratio, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
+
+	glm::vec3 refracted_start = incoming->endpoint - N * RAY_OFFSET;
+
+	Ray refracted_ray{ refracted_start, refracted_direction, refracted_importance };
+
+	reflected_ray.inside_transparent_object = incoming->inside_transparent_object;
+	refracted_ray.inside_transparent_object = !incoming->inside_transparent_object;
+
+	reflected_ray.depth = incoming->depth + 1;
+	refracted_ray.depth = incoming->depth + 1;
+
+	std::vector<Ray> result;
+	result.push_back(reflected_ray);
+	result.push_back(refracted_ray);
+
+	return result;
+}
