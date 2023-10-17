@@ -83,55 +83,56 @@ std::vector<Ray> LightSource::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 }
 
 
-std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incoming) const
+std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) const
 {
-	double reflected_importance{ 0.0 };
-	double refracted_importance{ 0.0 };
+	double importance_reflected{ 0.0 };
+	double importance_refracted{ 0.0 };
 
-	glm::vec3 N = incoming->inside_transparent_object ? -incoming->target->CalcUnitNormal(incoming->endpoint) : incoming->target->CalcUnitNormal(incoming->endpoint);
-	glm::vec3 I = incoming->direction;
+	glm::vec3 N = incomingRay->inside_transparent_object ? -incomingRay->target->CalcUnitNormal(incomingRay->endpoint) : incomingRay->target->CalcUnitNormal(incomingRay->endpoint); // Switch normal depending on inside or outside of object.
+	glm::vec3 I = incomingRay->direction;
 
-	double cos_inc_angle = glm::dot(-I, N);
-	double inc_angle = glm::acos(cos_inc_angle);
+	double cos_omega = glm::dot(-I, N); 
+	double omega = glm::acos(cos_omega); // incident angle of the incoming ray
 
-	double max_angle = glm::asin(REFLECTIVE_INDEX_AIR / this->reflective_index);
+	double max_angle = glm::asin(REFLECTIVE_INDEX_AIR / this->reflective_index); // Max angle that refraction can occur
 
-	if (incoming->depth < MAX_DEPTH)
+	if (incomingRay->depth < MAX_DEPTH)
 	{
 
-		if (incoming->inside_transparent_object && inc_angle > max_angle)
+		if (incomingRay->inside_transparent_object && omega > max_angle) // total internal reflection
 		{
-			reflected_importance = incoming->importance;
+			importance_reflected = incomingRay->importance;
 		}
 		else
 		{
 			// Schlicks equation
-			double R0 = incoming->inside_transparent_object ?
+			double R0 = incomingRay->inside_transparent_object ?
 				glm::pow(((this->reflective_index - REFLECTIVE_INDEX_AIR) / (REFLECTIVE_INDEX_AIR + this->reflective_index)), 2.0)
 				: glm::pow(((REFLECTIVE_INDEX_AIR - this->reflective_index) / (REFLECTIVE_INDEX_AIR + this->reflective_index)), 2.0);
-
-			reflected_importance = (R0 + (1.0 - R0) * glm::pow((1.0 - cos_inc_angle), 5.0)) * incoming->importance;
-			refracted_importance = (1.0 - reflected_importance) * incoming->importance;
+			// The brdfs of the reflected and refracted rays
+			importance_reflected = (R0 + (1.0 - R0) * glm::pow((1.0 - cos_omega), 5.0)) * incomingRay->importance;
+			importance_refracted = (1.0 - importance_reflected) * incomingRay->importance;
 		}
 	}
+	
+	Ray reflected_ray{ incomingRay->endpoint + N * RAY_OFFSET,	// Start with offset
+				glm::normalize(glm::reflect(incomingRay->endpoint, N)),
+				importance_reflected };
 
-	Ray reflected_ray{ incoming->endpoint + N * RAY_OFFSET,	// Start with offset
-				glm::normalize(glm::reflect(incoming->endpoint, N)),
-				reflected_importance };
+	float R = incomingRay->inside_transparent_object ? this->reflective_index / REFLECTIVE_INDEX_AIR : REFLECTIVE_INDEX_AIR / this->reflective_index; // The ratio of the refractive indicies, depending on inside or outside object
+	glm::vec3 refracted_direction = R * I + N * (-R * glm::dot(N, I) // Here we could also use glm::refract(I, N, R)
+		- glm::sqrt(1.0f - glm::pow(R, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
 
-	float reflective_ratio = incoming->inside_transparent_object ? this->reflective_index / REFLECTIVE_INDEX_AIR : REFLECTIVE_INDEX_AIR / this->reflective_index;
-	glm::vec3 refracted_direction = reflective_ratio * I + N * (-reflective_ratio * glm::dot(N, I)
-		- glm::sqrt(1.0f - glm::pow(reflective_ratio, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
+	glm::vec3 refracted_start = incomingRay->endpoint - N * RAY_OFFSET;
 
-	glm::vec3 refracted_start = incoming->endpoint - N * RAY_OFFSET;
+	Ray refracted_ray{ refracted_start, refracted_direction, importance_refracted };
 
-	Ray refracted_ray{ refracted_start, refracted_direction, refracted_importance };
+	// set inside or outside state of the ray
+	reflected_ray.inside_transparent_object = incomingRay->inside_transparent_object;
+	refracted_ray.inside_transparent_object = !incomingRay->inside_transparent_object;
 
-	reflected_ray.inside_transparent_object = incoming->inside_transparent_object;
-	refracted_ray.inside_transparent_object = !incoming->inside_transparent_object;
-
-	reflected_ray.depth = incoming->depth + 1;
-	refracted_ray.depth = incoming->depth + 1;
+	reflected_ray.depth = (incomingRay->depth + 1);
+	refracted_ray.depth = (incomingRay->depth + 1);
 
 	std::vector<Ray> result;
 	result.push_back(reflected_ray);

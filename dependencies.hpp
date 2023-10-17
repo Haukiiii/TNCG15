@@ -30,8 +30,8 @@
 constexpr float epsilon{ 1e-4f }; // Used to address precision/numerical stability issues that can arise due to limited float-precision 
 constexpr float RAY_OFFSET{ 3e-2f }; // Used to avoid self-intersections when tracing reflected rays
 constexpr int AMOUNT_SHADOWRAYS{ 1 }; // Multiple shadowrays can generate 'soft shadows'
-constexpr int DIFF_BOUNCES{ 2 }; // Amount of sampled diffuse bounces
-constexpr int MAX_DEPTH{ 10 }; // Maximum depth of a ray tree 12
+constexpr int DIFF_BOUNCES{ 1 }; // Amount of sampled diffuse bounces
+constexpr int MAX_DEPTH{ 12 }; // Maximum depth of a ray tree 12
 constexpr float IMPORTANCE_THRESHOLD{0.1f}; // Rays with importance below threshold will be discarded
 constexpr float MAX_ABS{ 0.65f }; // Can vary widely depending on the material you are simulating. For common materials, it might range from 0.1 to 10. Materials with higher absorption coefficients will appear darker and more absorbent.
 constexpr float MIN_ABS{ 0.33f }; // Should be close to 0, a very small positive number for materials that you want to appear bright and reflective, such as diffuse materials with little absorption.
@@ -39,8 +39,8 @@ constexpr float FLUX_DROPOFF{ 2.0f }; // Used to simulate how light intensity de
 constexpr float REFLECTIVE_INDEX_AIR = 1.0f;
 constexpr float REFLECTIVE_INDEX_GLASS = 1.5f;
 
-constexpr size_t res{ 800 }; //resolution of the image (res*res) 800
-constexpr int samples{ 8 }; 
+constexpr size_t res{ 600 }; //resolution of the image (res*res) 800
+constexpr int samples{ 10 }; 
 
 //predefined colors
 constexpr glm::dvec3 red{ 1.0, 0.0, 0.0 };

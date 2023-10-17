@@ -28,29 +28,11 @@ struct Triangle: public Polygon
     Triangle() = default;
     Triangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const Material* material);
 
-    glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override;
+    glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override { return glm::normalize(glm::cross(this->edge1, this->edge2)); }
 
     float rayIntersection(Ray* ray) const override; //method for calulating ray intersection with triangle, returns the parameter t which determines a point on a ray
 
     std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override; //generates shadowrays with random endpoint on triangular lightsource
-};
-
-struct Rectangle: public Polygon
-{
-    std::array<glm::vec3, 4> vertices;
-	glm::vec3 normal;
-	glm::vec3 edge1;
-	glm::vec3 edge2;
-	glm::vec3 edge3;
-    
-	Rectangle() = default;
-    Rectangle(const glm::vec3& v1, const glm::vec3& v2, const glm::vec3& v3, const glm::vec3& v4, const Material* material);
-    
-    glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override;
-
-    std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override; // kanske onädig då vi bara använder triagnlar?
-
-    float rayIntersection(Ray* ray) const override; //method for calulating ray intersection with rectangle, returns the parameter t which determines a point on a ray
 };
 
 struct Sphere : public Polygon {
@@ -62,8 +44,8 @@ struct Sphere : public Polygon {
         : Polygon{ material }, position{ pos }, radius{ rad } {};
 
     float rayIntersection(Ray* ray) const override;
-    std::vector<Ray> generateShadowRays(const glm::vec3& start) const override;
-    glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override;
+    std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override;
+    glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override { return glm::normalize(hit - this->position); }
 };
 
 struct Box : public Triangle {

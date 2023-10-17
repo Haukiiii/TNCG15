@@ -1,5 +1,5 @@
 #include "dependencies.hpp"
-
+/* This file contains all the setup of the room itself, as well as the objects contained in the room. */
 Room::Room() {
 	create_Room();
 }
@@ -14,15 +14,15 @@ void Room::create_Room() {
 
 	//Materials
 	std::cout << "----Creating materials----" << std::endl;
-	Diffuse wallMaterial1{lightgray, 0.2}; // Front left
-	Diffuse wallMaterial2{lightgray, 0.2}; // Front right
-	Diffuse wallMaterial3{green, 0.6}; // Center left
-	Diffuse wallMaterial4{red, 0.6}; // Center right
-	Diffuse wallMaterial5{lightgray, 0.2}; // Back left
-	Diffuse wallMaterial6{lightgray, 0.2}; // Back right
+	Diffuse wallMaterial1{lightgray, 0.2}; // Back left
+	Diffuse wallMaterial2{lightgray, 0.2}; // Back right
+	Diffuse wallMaterial3{green, 0.5}; // Center left
+	Diffuse wallMaterial4{red, 0.5}; // Center right
+	Diffuse wallMaterial5{lightgray, 0.2}; // Front left
+	Diffuse wallMaterial6{lightgray, 0.2}; // Front right
 
-	Diffuse ceilingMaterial{lightgray, 0.6};
-	Diffuse floorMaterial{lightgray, 0.2};
+	Diffuse ceilingMaterial{lightgray, 0.5};
+	Diffuse floorMaterial{lightgray, 0.5};
 
 	Mirror mirror{};
 	Diffuse boxMaterial{yellow, 0.2};
@@ -33,76 +33,6 @@ void Room::create_Room() {
 	Diffuse transparentMaterial{ black, REFLECTIVE_INDEX_GLASS };
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
-
-	// Define the vertices of the BOOOX
-	/* ------- New box function 
-	const glm::vec3 B0(-0.125f, -0.125f, -0.125f); // Bottom-back-left corner
-	const glm::vec3 B1(0.125f, -0.125f, -0.125f);  // Bottom-back-right corner
-	const glm::vec3 B2(0.125f, 0.125f, -0.125f);   // Bottom-front-right corner
-	const glm::vec3 B3(-0.125f, 0.125f, -0.125f);  // Bottom-front-left corner
-	const glm::vec3 B4(-0.125f, -0.125f, 0.125f);  // Top-back-left corner
-	const glm::vec3 B5(0.125f, -0.125f, 0.125f);   // Top-back-right corner
-	const glm::vec3 B6(0.125f, 0.125f, 0.125f);    // Top-front-right corner
-	const glm::vec3 B7(-0.125f, 0.125f, 0.125f);   // Top-front-left corner
-
-	// Calculate the rotation matrix
-	const float rotationAngle{60};
-	glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-	*/
-	// Apply the rotation to each vertex
-
-	/* ------- New box function 
-	const glm::vec3 rotB0 = glm::vec3(rotationMatrix * glm::vec4(B0, 1.0f));
-	const glm::vec3 rotB1 = glm::vec3(rotationMatrix * glm::vec4(B1, 1.0f));
-	const glm::vec3 rotB2 = glm::vec3(rotationMatrix * glm::vec4(B2, 1.0f));
-	const glm::vec3 rotB3 = glm::vec3(rotationMatrix * glm::vec4(B3, 1.0f));
-	const glm::vec3 rotB4 = glm::vec3(rotationMatrix * glm::vec4(B4, 1.0f));
-	const glm::vec3 rotB5 = glm::vec3(rotationMatrix * glm::vec4(B5, 1.0f));
-	const glm::vec3 rotB6 = glm::vec3(rotationMatrix * glm::vec4(B6, 1.0f));
-	const glm::vec3 rotB7 = glm::vec3(rotationMatrix * glm::vec4(B7, 1.0f));
-	
-	
-	Triangle box0{rotB0, rotB1, rotB2, &boxMaterial}; // BOTTOM 
-	Triangle box1{rotB0, rotB2, rotB3, &boxMaterial}; 
-	Triangle box2{rotB4, rotB5, rotB6, &boxMaterial}; // TOP
-	Triangle box3{rotB4, rotB6, rotB7, &boxMaterial}; 
-	Triangle box4{rotB0, rotB4, rotB7, &boxMaterial}; // LEFT
-	Triangle box5{rotB0, rotB7, rotB3, &boxMaterial}; 
-	Triangle box6{rotB1, rotB5, rotB6, &boxMaterial}; // RIGHT
-	Triangle box7{rotB1, rotB6, rotB2, &boxMaterial}; 
-	Triangle box8{rotB0, rotB1, rotB5, &boxMaterial}; // BACK
-	Triangle box9{rotB0, rotB5, rotB4, &boxMaterial}; 
-	Triangle box10{rotB2, rotB6, rotB7, &boxMaterial}; // FRONT
-	Triangle box11{rotB2, rotB7, rotB3, &boxMaterial};  
-	*/
-
-	/* Triangle box0{B0, B1, B2, &boxMaterial}; // BOTTOM 
-	Triangle box1{B0, B2, B3, &boxMaterial}; 
-	Triangle box2{B4, B5, B6, &boxMaterial}; // TOP
-	Triangle box3{B4, B6, B7, &boxMaterial}; 
-	Triangle box4{B0, B4, B7, &boxMaterial}; // LEFT
-	Triangle box5{B0, B7, B3, &boxMaterial}; 
-	Triangle box6{B1, B5, B6, &boxMaterial}; // RIGHT
-	Triangle box7{B1, B6, B2, &boxMaterial}; 
-	Triangle box8{B0, B1, B5, &boxMaterial}; // BACK
-	Triangle box9{B0, B5, B4, &boxMaterial}; 
-	Triangle box10{B2, B6, B7, &boxMaterial}; // FRONT
-	Triangle box11{B2, B7, B3, &boxMaterial};  
- 
-	scene.addPolygon(&box1);
-	scene.addPolygon(&box2);
-	scene.addPolygon(&box3);
-	scene.addPolygon(&box4);
-	scene.addPolygon(&box5);
-	scene.addPolygon(&box6);
-	scene.addPolygon(&box7);
-	scene.addPolygon(&box8);
-	scene.addPolygon(&box9);
-	scene.addPolygon(&box10);
-	scene.addPolygon(&box11);
-*/
-
-	
 
 	//----All cordiantes for the room (TODO -> floor and ceiling mixed up for some reason?)----//
 	// floor
@@ -156,23 +86,24 @@ void Room::create_Room() {
 	Triangle ceiling6{P11, P6, PF, &ceilingMaterial};
 
 	//----Walls----//
-	Triangle wall11{P4, P5, P10, &wallMaterial1}; //Front left wall (closest to camera)
-	Triangle wall12{P5, P11, P10, &wallMaterial1};
 
-	Triangle wall21{P0, P1, P6, &wallMaterial2}; //Front right wall (closest to camera)
-	Triangle wall22{P1, P7, P6, &wallMaterial2};
+	Triangle wall11{P3, P4, P9, &mirror}; //Back left wall (furthest from camera)
+	Triangle wall12{P4, P10, P9, &mirror};
 
+	Triangle wall21{P4, P5, P10, &wallMaterial2}; // Back right wall (furthest from camera)
+	Triangle wall22{P5, P11, P10, &wallMaterial2};
+	
 	Triangle wall31{P2, P3, P8,  &wallMaterial3}; //Center Left wall
 	Triangle wall32{P3, P9, P8, &wallMaterial3};
 
 	Triangle wall41{P5, P0, P11, &wallMaterial4}; //Center right wall
 	Triangle wall42{P0, P6, P11, &wallMaterial4};
 
-	Triangle wall51{P3, P4, P9, &mirror}; //Back left wall (furthest from camera)
-	Triangle wall52{P4, P10, P9, &mirror};
+	Triangle wall51{P1, P2, P7, &wallMaterial5}; //Front left wall (closest to camera)
+	Triangle wall52{P2, P8, P7, &wallMaterial5}; 
 
-	Triangle wall61{P1, P2, P7, &mirror}; //Back right wall (furthest from camera)
-	Triangle wall62{P2, P8, P7, &mirror}; 
+	Triangle wall61{P0, P1, P6, &wallMaterial6}; //Front right wall (closest to camera)
+	Triangle wall62{P1, P7, P6, &wallMaterial6};
 
 	//----Lights----//
 	Triangle light1{ P13, P12, P14, &light };
@@ -187,17 +118,6 @@ void Room::create_Room() {
     Triangle triangle26{ P21, P24, P23, &border };
     Triangle triangle27{ P19, P23, P24, &border };
     Triangle triangle28{ P19, P24, P20, &border };
-
-	// Create triangles for the ceiling and floor
-	/* Triangle floor1{P0, P5, P1, &floorMaterial};
-	Triangle floor2{P5, P4, P1, &floorMaterial};
-	Triangle floor3{P1, P4, P3, &floorMaterial};
-	Triangle floor4{P3, P2, P1, &floorMaterial};
-
-	Triangle ceiling1{P6, P7, P11, &ceilingMaterial};
-	Triangle ceiling2{P7, P8, P11, &ceilingMaterial};
-	Triangle ceiling3{P8, P9, P11, &ceilingMaterial};
-	Triangle ceiling4{P9, P10, P11, &ceilingMaterial}; */
 	
 	std::cout << "----Adding Polygons----" << std::endl;
 	//scene.addPolygon(&yeet);
@@ -240,15 +160,15 @@ void Room::create_Room() {
 
 
 	// add box
-	Box b1 = Box(glm::vec3(5.0f, -3.0f, 4.0f), 2.0f, 1.5f, 1.5f, &boxMaterial);
+	Box b1 = Box(glm::vec3(6.0f, 0.0f, 4.0f), 1.5f, 1.5f, 1.5f, &boxMaterial);
 	scene.addBox(&b1);
 
-	Box b2 = Box(glm::vec3(7.2f, 2.5f, 2.5f), 5.0f, 1.5f, 1.5f, &boxMaterial2);
-	scene.addBox(&b2);
+	//Box b2 = Box(glm::vec3(7.2f, 2.5f, 2.5f), 5.0f, 1.5f, 1.5f, &boxMaterial2);
+	//scene.addBox(&b2);
 	
 	// add sphere
-	//Sphere s1{ glm::vec3(5.0f, -3.0f, 1.9f), 1.0f, &transparentMaterial };
-	//scene.addPolygon(&s1);
+	Sphere s1{ glm::vec3(3.0f, 0.0f, 1.9f), 1.0f, &transparentMaterial };
+	scene.addPolygon(&s1);
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
