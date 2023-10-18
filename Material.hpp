@@ -11,7 +11,7 @@ struct Material {
     Material(const glm::dvec3& color) : color{ color }{}
     Material(const glm::dvec3& color, double emittance) : color{ color }, emittance{ emittance }{} //constructor used when creating material for a light source.
 
-    virtual std::vector<Ray> BRDF(const std::shared_ptr<Ray> &incoming) const = 0;
+    virtual std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const = 0;
 };
 
 //---------------Subclasses of Material---------------//
@@ -21,7 +21,7 @@ struct Mirror: public Material{
 
     Mirror() : Material(){}
 
-    std::vector<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override;
+    std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const override;
 };
 
 //Diffuse Lambertian material
@@ -38,14 +38,14 @@ struct Transparent : Material
 {
     float reflective_index;
 
-    Transparent(const glm::dvec3& color, float index) : Material(color), reflective_index(index) {};
+    Transparent(const glm::dvec3& color, float index) : Material(color), reflective_index{ index } {};
 
-    std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incoming) const override;
+    std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const override;
 };
 
 struct LightSource: public Material {
 
     LightSource(const glm::dvec3& color, double emittance) : Material(color, emittance){}
 
-    std::vector<Ray> BRDF(const std::shared_ptr<Ray> &incomingRay) const override; //Rays stop at lightsources
+    std::vector<Ray> BRDF(const std::shared_ptr<Ray>& incomingRay) const override; //Rays stop at lightsources
 };

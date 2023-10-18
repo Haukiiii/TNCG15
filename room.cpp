@@ -30,7 +30,7 @@ void Room::create_Room() {
 	LightSource light{white, 60};
 	Diffuse border{black, 0.2};
 	Diffuse sphereMaterial{ white, 0.2 };
-	Diffuse transparentMaterial{ black, REFLECTIVE_INDEX_GLASS };
+	Diffuse transparentMaterial{ white, REFLECTIVE_INDEX_GLASS };
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
 

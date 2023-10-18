@@ -94,7 +94,7 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 	double cos_omega = glm::dot(-I, N); 
 	double omega = glm::acos(cos_omega); // incident angle of the incoming ray
 
-	double max_angle = glm::asin(REFLECTIVE_INDEX_AIR / this->reflective_index); // Max angle that refraction can occur
+	double max_angle = glm::asin(REFLECTIVE_INDEX_GLOBAL / this->reflective_index); // Max angle that refraction can occur
 
 	if (incomingRay->depth < MAX_DEPTH)
 	{
@@ -106,9 +106,8 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 		else
 		{
 			// Schlicks equation
-			double R0 = incomingRay->inside_transparent_object ?
-				glm::pow(((this->reflective_index - REFLECTIVE_INDEX_AIR) / (REFLECTIVE_INDEX_AIR + this->reflective_index)), 2.0)
-				: glm::pow(((REFLECTIVE_INDEX_AIR - this->reflective_index) / (REFLECTIVE_INDEX_AIR + this->reflective_index)), 2.0);
+			double R0 = glm::pow(((REFLECTIVE_INDEX_GLOBAL - this->reflective_index) / (REFLECTIVE_INDEX_GLOBAL + this->reflective_index)), 2.0); // unchanged if n1/n2 are switched
+
 			// The brdfs of the reflected and refracted rays
 			importance_reflected = (R0 + (1.0 - R0) * glm::pow((1.0 - cos_omega), 5.0)) * incomingRay->importance;
 			importance_refracted = (1.0 - importance_reflected) * incomingRay->importance;
@@ -119,24 +118,24 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 				glm::normalize(glm::reflect(incomingRay->endpoint, N)),
 				importance_reflected };
 
-	float R = incomingRay->inside_transparent_object ? this->reflective_index / REFLECTIVE_INDEX_AIR : REFLECTIVE_INDEX_AIR / this->reflective_index; // The ratio of the refractive indicies, depending on inside or outside object
-	glm::vec3 refracted_direction = R * I + N * (-R * glm::dot(N, I) // Here we could also use glm::refract(I, N, R)
-		- glm::sqrt(1.0f - glm::pow(R, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
-
+	float R = incomingRay->inside_transparent_object ? this->reflective_index / REFLECTIVE_INDEX_GLOBAL : REFLECTIVE_INDEX_GLOBAL / this->reflective_index; // The ratio of the refractive indicies, depending on inside or outside object
+	//glm::vec3 refracted_direction = R * I + N * (-R * glm::dot(N, I) // Here we could also use glm::refract(I, N, R)
+	//	- glm::sqrt(1.0f - glm::pow(R, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
+	glm::vec3 refracted_direction = glm::refract(I,N,R);
 	glm::vec3 refracted_start = incomingRay->endpoint - N * RAY_OFFSET;
 
 	Ray refracted_ray{ refracted_start, refracted_direction, importance_refracted };
 
 	// set inside or outside state of the ray
-	reflected_ray.inside_transparent_object = incomingRay->inside_transparent_object;
-	refracted_ray.inside_transparent_object = !incomingRay->inside_transparent_object;
+	reflected_ray.inside_transparent_object = incomingRay->inside_transparent_object; // reflected ray stays on same side as incoming
+	refracted_ray.inside_transparent_object = !incomingRay->inside_transparent_object; // refracted ray is on opposite side as incoming
 
 	reflected_ray.depth = (incomingRay->depth + 1);
 	refracted_ray.depth = (incomingRay->depth + 1);
 
-	std::vector<Ray> result;
-	result.push_back(reflected_ray);
-	result.push_back(refracted_ray);
+	std::vector<Ray> outgoing;
+	outgoing.push_back(reflected_ray);
+	outgoing.push_back(refracted_ray);
 
-	return result;
+	return outgoing;
 }

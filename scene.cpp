@@ -139,7 +139,7 @@
                     currentRay->radiance = localLighting(*currentRay);
                     for(std::shared_ptr<Ray>& c : currentRay->children) 
                     {
-                        currentRay->radiance += c->radiance * c->importance / currentRay->importance * 0.8;  
+                        currentRay->radiance += c->radiance * c->importance / currentRay->importance * 0.7; //adjust constant for global light contribution
 					    c.reset(); //free memory
                     }
 
