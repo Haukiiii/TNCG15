@@ -68,19 +68,19 @@
                 if(!lightOccluded) 
                 {
 
-                glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) };
-                glm::vec3 lightNormal { l->CalcUnitNormal(incomingRay.endpoint) };
+                    glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) };
+                    glm::vec3 lightNormal { l->CalcUnitNormal(incomingRay.endpoint) };
+                    
+                    // determinine how much of the incoming light contributes to the radiance at point
+                    double beta = glm::dot(r.direction, -lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
+                    double alpha = glm::dot(targetNormal, r.direction); // how well-aligned the surface normal is with the shadow ray direction
+                    double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
+                    cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
+
+                    double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
+
+                    lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
                 
-                // determinine how much of the incoming light contributes to the radiance at point
-                double beta = glm::dot(r.direction, -lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
-				double alpha = glm::dot(targetNormal, r.direction); // how well-aligned the surface normal is with the shadow ray direction
-				double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
-				cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
-
-				double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
-
-				lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
-			
                 }
                 
             }

@@ -82,11 +82,9 @@ float Sphere::rayIntersection(Ray* ray) const
        // All dot products for the quadratic formula
     glm::vec3 dot_prods{};
 
-    glm::vec3 dir = glm::normalize(ray->direction);
-
-    dot_prods.x = glm::dot(dir, dir);
-    dot_prods.y = 2 * glm::dot(dir, ray->startpoint - this->position);
-    dot_prods.z = glm::dot(ray->startpoint - this->position, ray->startpoint - this->position) - glm::pow(this->radius, 2.0);
+    dot_prods.x = glm::dot(ray->direction, ray->direction);
+    dot_prods.y = glm::dot(ray->startpoint - this->position, 2.0f * ray->direction);
+    dot_prods.z = glm::dot(ray->startpoint - this->position, ray->startpoint - this->position) - this->radius * this->radius;
 
     // The dicriminant which check for hits
     float discriminant = dot_prods.y * dot_prods.y / 4.0f - dot_prods.x * dot_prods.z;
@@ -96,8 +94,8 @@ float Sphere::rayIntersection(Ray* ray) const
         return -1.0;
     }
 
-    float numerator_neg = -(dot_prods.y / 2.0f * dot_prods.x) - glm::sqrt(discriminant);
-    float numerator_pos = -(dot_prods.y / 2.0f * dot_prods.x) + glm::sqrt(discriminant);
+    float numerator_neg = -(dot_prods.y / 2.0f * dot_prods.x) - sqrt(discriminant);
+    float numerator_pos = -(dot_prods.y / 2.0f * dot_prods.x) + sqrt(discriminant);
 
     numerator_neg = glm::max(numerator_neg, 0.0f);
     numerator_pos = glm::max(numerator_pos, 0.0f);

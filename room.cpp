@@ -167,7 +167,7 @@ void Room::create_Room() {
 	//scene.addBox(&b2);
 	
 	// add sphere
-	Sphere s1{ glm::vec3(3.0f, 0.0f, 1.9f), 1.0f, &transparentMaterial };
+	Sphere s1{ glm::vec3(5.0f, 3.0f, 1.9f), 1.0f, &sphereMaterial };
 	scene.addPolygon(&s1);
 
 	std::cout << "----Rendering scene----" << std::endl;
