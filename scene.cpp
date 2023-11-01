@@ -30,7 +30,7 @@
         if(incomingRay.target == nullptr) { return terminalRadiance; } //fixes bug when occasionally target is null.******
 
         // If target is a lightsource simply return color of material
-        if(incomingRay.target->material->emittance != 0.0) {
+        if(incomingRay.target->material->flux != 0.0) {
             return incomingRay.target->material->color; 
         }
 
@@ -46,20 +46,20 @@
 
                 bool lightOccluded{false}; 
 
-                float lightDistance{glm::length(r.endpoint - r.startpoint)}; //TODO vid error ändra direction till endpoint-startpoint
+                float lightDistance{glm::length(r.endpoint - r.startpoint)}; 
 
                 for(Polygon* geometry : polygons) //check if any geometry in the scene occludes the lightsource
                 {
                     Ray compare{r}; //copy shadowray for comparison
 
                     //make sure other lightsources and transparent objects are ignored 
-                    //if(geometry->material->emittance == 0.0)
+                    //if(geometry->material->flux == 0.0)
                     if(dynamic_cast<const LightSource*>(geometry->material) == nullptr && dynamic_cast<const Transparent*>(geometry->material) == nullptr)
                     {
                         float intersection{geometry->rayIntersection(&r)};
                         compare.setEndpoint(intersection);
 
-                        if(intersection > epsilon && lightDistance > glm::length(compare.endpoint - compare.startpoint)) { //TODO vid error ändra direction till endpoint-startpoint
+                        if(intersection > epsilon && lightDistance > glm::length(compare.endpoint - compare.startpoint)) {
                             lightOccluded = true;
                             break;
                         }   
@@ -67,19 +67,20 @@
                 }
                 if(!lightOccluded) 
                 {
-
-                    glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) };
-                    glm::vec3 lightNormal { l->CalcUnitNormal(incomingRay.endpoint) };
+                    //see lecture 7 setting up Irradiance estimator <E(x)>
+                    glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) }; //Nx
+                    glm::vec3 lightNormal { l->CalcUnitNormal(r.endpoint) }; //Ny
+                    glm::vec3 r_direction {glm::normalize(r.endpoint - r.startpoint) }; // d/||d|| 
                     
                     // determinine how much of the incoming light contributes to the radiance at point
-                    double beta = glm::dot(r.direction, -lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
-                    double alpha = glm::dot(targetNormal, r.direction); // how well-aligned the surface normal is with the shadow ray direction
-                    double cos_term = alpha * beta; // angle between surface normal and shadow ray direction
+                    double cos_light = glm::dot(r_direction, -lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
+                    double cos_target = glm::dot(targetNormal, r_direction); // how well-aligned the surface normal is with the shadow ray direction
+                    double cos_term = cos_target * cos_light; // angle between surface normal and shadow ray direction
                     cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
 
                     double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
 
-                    lightRadiance += l->material->emittance * cos_term * l->material->color / (dropoff * lights.size());
+                    lightRadiance += ((l->material->flux / l->getArea()) / M_PI) * l->getArea() * cos_term * l->material->color / (dropoff * lights.size());
                 
                 }
                 

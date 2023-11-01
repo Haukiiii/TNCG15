@@ -15,6 +15,7 @@ struct Polygon
     virtual float rayIntersection(Ray* ray) const = 0; //method to calculate ray intersection with rect/triangle, overrides in both subclasses.
 
     virtual std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const = 0;
+    virtual double getArea() const = 0;
 };
 
 
@@ -33,6 +34,8 @@ struct Triangle: public Polygon
     float rayIntersection(Ray* ray) const override; //method for calulating ray intersection with triangle, returns the parameter t which determines a point on a ray
 
     std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override; //generates shadowrays with random endpoint on triangular lightsource
+
+    double getArea() const override {return glm::length((glm::cross(this->edge1, this->edge2))) * 0.5;} //returns the area of this triangle
 };
 
 struct Sphere : public Polygon {
@@ -46,6 +49,8 @@ struct Sphere : public Polygon {
     float rayIntersection(Ray* ray) const override;
     std::vector<Ray> generateShadowRays(const glm::vec3& startpoint) const override;
     glm::vec3 CalcUnitNormal(const glm::vec3& hit) const override { return glm::normalize(hit - this->position); }
+
+    double getArea() const override {return 1.0;} //not used but must be here....
 };
 
 struct Box : public Triangle {

@@ -125,6 +125,7 @@ std::vector<Ray> Triangle::generateShadowRays(const glm::vec3& startpoint) const
 	return shadowrays;
 }
 
+//Implementera för att kunna ha sfäriska ljuskällor
 std::vector<Ray> Sphere::generateShadowRays(const glm::vec3& startpoint) const
 {
     std::vector<Ray> shadowrays;

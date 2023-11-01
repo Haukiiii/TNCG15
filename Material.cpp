@@ -55,7 +55,7 @@ std::vector<Ray> Diffuse::BRDF(const std::shared_ptr<Ray>& incomingRay) const {
         // Generate random number between [0,1], if greater than the specified absorption, the ray reflection is considered, otherwise reflection is terminated. 
         
         if (static_cast<double>(rand()) / RAND_MAX > this->absorption) {
-            importance_outgoing = incomingRay->importance * this->reflectance / (this->absorption * DIFF_BOUNCES);
+            importance_outgoing = incomingRay->importance * this->reflectance / this->absorption * static_cast<double>(DIFF_BOUNCES);
         }
 
         Ray outgoingRay{ incomingRay->endpoint + incomingRay->target->CalcUnitNormal(incomingRay->endpoint) * RAY_OFFSET, //// Startpoint with slight offset to avoid self-intersections
@@ -119,9 +119,9 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 				importance_reflected };
 
 	float R = incomingRay->inside_transparent_object ? this->reflective_index / REFLECTIVE_INDEX_GLOBAL : REFLECTIVE_INDEX_GLOBAL / this->reflective_index; // The ratio of the refractive indicies, depending on inside or outside object
-	//glm::vec3 refracted_direction = R * I + N * (-R * glm::dot(N, I) // Here we could also use glm::refract(I, N, R)
-	//	- glm::sqrt(1.0f - glm::pow(R, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
-	glm::vec3 refracted_direction = glm::refract(I,N,R);
+	glm::vec3 refracted_direction = R * I + N * (-R * glm::dot(N, I) // Here we could also use glm::refract(I, N, R)
+		- glm::sqrt(1.0f - glm::pow(R, 2.0f) * (1.0f - glm::pow(glm::dot(N, I), 2.0f))));
+	//glm::vec3 refracted_direction = glm::refract(I,N,R);
 	glm::vec3 refracted_start = incomingRay->endpoint - N * RAY_OFFSET;
 
 	Ray refracted_ray{ refracted_start, refracted_direction, importance_refracted };

@@ -26,11 +26,12 @@ void Room::create_Room() {
 
 	Mirror mirror{};
 	Diffuse boxMaterial{yellow, 0.2};
-	Diffuse boxMaterial2{white, 0.8}; //Easier to spot color-bleeding in tests
-	LightSource light{white, 60};
+	Diffuse boxMaterial2{yellow, 0.6}; //Easier to spot color-bleeding in tests
 	Diffuse border{black, 0.2};
-	Diffuse sphereMaterial{ white, 0.2 };
+	Diffuse sphereMaterial{ yellow, 0.2 };
 	Diffuse transparentMaterial{ white, REFLECTIVE_INDEX_GLASS };
+
+	LightSource light{white, 100};
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
 
@@ -53,11 +54,17 @@ void Room::create_Room() {
 	const glm::vec3 PF{5.0f, 0.0f, -5.0f}; //center vertex
 
 	//light
+	/*
 	const glm::vec3 P12{ 6.0f, 1.0f, -4.8f };
     const glm::vec3 P13{ 5.0f, -1.0f, -4.8f };
     const glm::vec3 P14{ 5.0f, 1.0f, -4.8f };
     const glm::vec3 P15{ 6.0f, -1.0f, -4.8f };
-
+	*/
+	const glm::vec3 P12{ 6.0f, 5.0f, -4.98f }; //light attenuation test(move light to right side)
+    const glm::vec3 P13{ 5.0f, 3.0f, -4.98f };
+    const glm::vec3 P14{ 5.0f, 5.0f, -4.98f };
+    const glm::vec3 P15{ 6.0f, 3.0f, -4.98f };
+	
 	//light border
 	const glm::vec3 P17{ 5.0f, 1.0f, 4.8f };
     const glm::vec3 P18{ 5.0f, 1.0f, 4.8f };
@@ -158,17 +165,19 @@ void Room::create_Room() {
     scene.addPolygon(&triangle27);
     scene.addPolygon(&triangle28); */
 
-
 	// add box
-	Box b1 = Box(glm::vec3(6.0f, 0.0f, 4.0f), 1.5f, 1.5f, 1.5f, &boxMaterial);
-	scene.addBox(&b1);
+	//Box b1 = Box(glm::vec3(6.0f, 0.0f, 4.0f), 1.5f, 1.5f, 1.5f, &transparentMaterial);
+	//scene.addBox(&b1);
 
 	//Box b2 = Box(glm::vec3(7.2f, 2.5f, 2.5f), 5.0f, 1.5f, 1.5f, &boxMaterial2);
 	//scene.addBox(&b2);
 	
 	// add sphere
-	Sphere s1{ glm::vec3(5.0f, 3.0f, 1.9f), 1.0f, &sphereMaterial };
+	Sphere s1{ glm::vec3(5.0f, 3.0f, 1.9f), 1.5f, &transparentMaterial };
 	scene.addPolygon(&s1);
+
+	Sphere s2{ glm::vec3(6.0f, -3.0f, 1.9f), 1.0f, &sphereMaterial };
+	scene.addPolygon(&s2);
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
