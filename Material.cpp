@@ -87,7 +87,6 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 {
 	double importance_reflected{ 0.0 };
 	double importance_refracted{ 0.0 };
-
 	glm::vec3 N = incomingRay->inside_transparent_object ? -incomingRay->target->CalcUnitNormal(incomingRay->endpoint) : incomingRay->target->CalcUnitNormal(incomingRay->endpoint); // Switch normal depending on inside or outside of object.
 	glm::vec3 I = incomingRay->direction;
 
@@ -108,12 +107,12 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 			// Schlicks equation
 			double R0 = glm::pow(((REFLECTIVE_INDEX_GLOBAL - this->reflective_index) / (REFLECTIVE_INDEX_GLOBAL + this->reflective_index)), 2.0); // unchanged if n1/n2 are switched
 
-			// The brdfs of the reflected and refracted rays
+			// The brdfs of the reflected and refracted rays R(omega) and T(omega)
 			importance_reflected = (R0 + (1.0 - R0) * glm::pow((1.0 - cos_omega), 5.0)) * incomingRay->importance;
-			importance_refracted = (1.0 - importance_reflected) * incomingRay->importance;
+			importance_refracted = (1.0 - importance_reflected) * incomingRay->importance; 
 		}
 	}
-	
+
 	Ray reflected_ray{ incomingRay->endpoint + N * RAY_OFFSET,	// Start with offset
 				glm::normalize(glm::reflect(incomingRay->endpoint, N)),
 				importance_reflected };
@@ -134,8 +133,9 @@ std::vector<Ray> Transparent::BRDF(const std::shared_ptr<Ray>& incomingRay) cons
 	refracted_ray.depth = (incomingRay->depth + 1);
 
 	std::vector<Ray> outgoing;
-	outgoing.push_back(reflected_ray);
 	outgoing.push_back(refracted_ray);
+	outgoing.push_back(reflected_ray);
+	
 
 	return outgoing;
 }
