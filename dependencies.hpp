@@ -40,8 +40,8 @@ constexpr float REFLECTIVE_INDEX_AIR = 1.0f;
 constexpr float REFLECTIVE_INDEX_GLASS = 1.5f;
 constexpr float REFLECTIVE_INDEX_GLOBAL = REFLECTIVE_INDEX_AIR; 
 
-constexpr size_t res{ 200 }; //resolution of the image (res*res) 800
-constexpr int samples{ 16 }; 
+constexpr size_t res{ 100 }; //resolution of the image (res*res) 800
+constexpr int samples{ 4 }; 
 
 //predefined colors
 constexpr glm::dvec3 red{ 1.0, 0.0, 0.0 };

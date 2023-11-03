@@ -14,12 +14,12 @@ void Room::create_Room() {
 
 	//Materials
 	std::cout << "----Creating materials----" << std::endl;
-	Diffuse wallMaterial1{lightgray, 0.2}; // Back left
-	Diffuse wallMaterial2{lightgray, 0.2}; // Back right
+	Diffuse wallMaterial1{blue, 0.2}; // Back left
+	Diffuse wallMaterial2{yellow, 0.2}; // Back right
 	Diffuse wallMaterial3{green, 0.5}; // Center left
 	Diffuse wallMaterial4{red, 0.5}; // Center right
 	Diffuse wallMaterial5{lightgray, 0.2}; // Front left
-	Diffuse wallMaterial6{lightgray, 0.2}; // Front right
+	Diffuse wallMaterial6{cyan, 0.2}; // Front right
 
 	Diffuse ceilingMaterial{lightgray, 0.5};
 	Diffuse floorMaterial{lightgray, 0.5};
@@ -28,11 +28,11 @@ void Room::create_Room() {
 	Diffuse boxMaterial{yellow, 0.2};
 	Diffuse boxMaterial2{yellow, 0.6}; //Easier to spot color-bleeding in tests
 	Diffuse border{black, 0.2};
-	Diffuse sphereMaterial{ yellow, 0.2 };
-	Transparent transparentMaterial{ white, REFLECTIVE_INDEX_GLASS };
+	Diffuse sphereMaterial{ cyan, 0.2 };
+	Transparent transparentMaterial{ purple, REFLECTIVE_INDEX_GLASS };
 	Transparent transparentMaterial2{ white, REFLECTIVE_INDEX_GLASS };
 
-	LightSource light{white, 90};
+	LightSource light{white, 100};
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
 
@@ -55,12 +55,17 @@ void Room::create_Room() {
 	const glm::vec3 PF{5.0f, 0.0f, -5.0f}; //center vertex
 
 	//light
-	
+
 	const glm::vec3 P12{ 6.0f, 1.0f, -4.8f };
     const glm::vec3 P13{ 5.0f, -1.0f, -4.8f };
     const glm::vec3 P14{ 5.0f, 1.0f, -4.8f };
     const glm::vec3 P15{ 6.0f, -1.0f, -4.8f };
 	/*
+	const glm::vec3 P12{ 6.5f, 1.5f, -4.8f }; //scaling the light to be bigger
+    const glm::vec3 P13{ 4.5f, -1.5f, -4.8f };
+    const glm::vec3 P14{ 4.5f, 1.5f, -4.8f };
+    const glm::vec3 P15{ 6.5f, -1.5f, -4.8f };
+	
 	const glm::vec3 P12{ 6.0f, 5.0f, -4.98f }; //light attenuation test(move light to right side)
     const glm::vec3 P13{ 5.0f, 3.0f, -4.98f };
     const glm::vec3 P14{ 5.0f, 5.0f, -4.98f };
@@ -95,8 +100,8 @@ void Room::create_Room() {
 
 	//----Walls----//
 
-	Triangle wall11{P3, P4, P9, &mirror}; //Back left wall (furthest from camera)
-	Triangle wall12{P4, P10, P9, &mirror};
+	Triangle wall11{P3, P4, P9, &wallMaterial1}; //Back left wall (furthest from camera)
+	Triangle wall12{P4, P10, P9, &wallMaterial1};
 
 	Triangle wall21{P4, P5, P10, &wallMaterial2}; // Back right wall (furthest from camera)
 	Triangle wall22{P5, P11, P10, &wallMaterial2};
@@ -165,23 +170,33 @@ void Room::create_Room() {
     scene.addPolygon(&triangle26);
     scene.addPolygon(&triangle27);
     scene.addPolygon(&triangle28); */
+/*	
+Z
+^
+|
+|
+|
 
+*/
 	// add box
-	Box b1 = Box(glm::vec3(6.0f, -1.0f, 2.0f), 2.5f, 2.5f, 2.5f, &transparentMaterial2);
-	scene.addBox(&b1);
+	//Box b1 = Box(glm::vec3(6.0f, -1.0f, 2.0f), 2.5f, 2.5f, 2.5f, &transparentMaterial2);
+	//scene.addBox(&b1);
 
 	//Box b2 = Box(glm::vec3(7.2f, 2.5f, 2.5f), 5.0f, 1.5f, 1.5f, &boxMaterial2);
 	//scene.addBox(&b2);
 	
-	// add sphere
-	Sphere s1{ glm::vec3(5.0f, 3.0f, 1.9f), 1.5f, &transparentMaterial };
+	Sphere s0{ glm::vec3(6.0f, -2.0f, -0.5f), 1.5f, &transparentMaterial2 };
+	scene.addPolygon(&s0);
+
+	// transparent sphere right side
+	Sphere s1{ glm::vec3(7.3f, 3.5f, 3.97f), 2.0f, &transparentMaterial2 };
 	scene.addPolygon(&s1);
 
-	//Sphere s2{ glm::vec3(6.0f, -3.0f, 1.9f), 1.0f, &sphereMaterial };
-	//scene.addPolygon(&s2);
+	Sphere s2{ glm::vec3(8.5f, -2.8f, 3.97f), 2.0f, &mirror };
+	scene.addPolygon(&s2);
 
-	Sphere s3{ glm::vec3(-3.0f, 0.0f, 1.9f), 1.0f, &sphereMaterial };
-	scene.addPolygon(&s3);
+	//Sphere s3{ glm::vec3(6.0f, 1.5f, 2.0f), 1.0f, &sphereMaterial };
+	//scene.addPolygon(&s3);
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };
