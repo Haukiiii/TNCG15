@@ -73,11 +73,22 @@ void Camera::createImage() {
 
     // Write the PPM header information (P3 format for color images).
     imageFile << "P3\n" << res << " " << res << "\n255\n";
+    double max_intensity{0.0};
 
     // Iterate over each pixel and write its color to the image file.
     for (int j = 0; j < res; ++j) {
         for (int i = 0; i < res; ++i) {
-            Pixel& p = getPixel(i, j);
+            Pixel& p = getPixel(i, j); // minus to flip image Pixel& p = getPixel(res-1-i, res-1-j);
+
+             p.pixelColor = glm::sqrt(p.pixelColor);	// Color balancing
+
+            if (p.pixelColor.r > max_intensity)
+				max_intensity = p.pixelColor.r;
+			if (p.pixelColor.g > max_intensity)
+				max_intensity = p.pixelColor.g;
+			if (p.pixelColor.b > max_intensity)
+				max_intensity = p.pixelColor.b;
+
             int r = static_cast<int>(255.999 * p.pixelColor.r);
             int g = static_cast<int>(255.999 * p.pixelColor.g);
             int b = static_cast<int>(255.999 * p.pixelColor.b);

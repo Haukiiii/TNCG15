@@ -55,7 +55,7 @@ std::vector<Ray> Diffuse::BRDF(const std::shared_ptr<Ray>& incomingRay) const {
         // Generate random number between [0,1], if greater than the specified absorption, the ray reflection is considered, otherwise reflection is terminated. 
         
         if (static_cast<double>(rand()) / RAND_MAX > this->absorption) {
-            importance_outgoing = incomingRay->importance * this->reflectance / this->absorption * static_cast<double>(DIFF_BOUNCES);
+            importance_outgoing = incomingRay->importance * this->reflectance / static_cast<double>(DIFF_BOUNCES);
         }
 
         Ray outgoingRay{ incomingRay->endpoint + incomingRay->target->CalcUnitNormal(incomingRay->endpoint) * RAY_OFFSET, //// Startpoint with slight offset to avoid self-intersections

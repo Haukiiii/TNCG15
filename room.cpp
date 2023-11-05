@@ -16,27 +16,28 @@ void Room::create_Room() {
 	std::cout << "----Creating materials----" << std::endl;
 	Diffuse wallMaterial1{blue, 0.2}; // Back left
 	Diffuse wallMaterial2{yellow, 0.2}; // Back right
-	Diffuse wallMaterial3{green, 0.5}; // Center left
-	Diffuse wallMaterial4{red, 0.5}; // Center right
+	Diffuse wallMaterial3{green, 0.2}; // Center left
+	Diffuse wallMaterial4{red, 0.2}; // Center right
 	Diffuse wallMaterial5{lightgray, 0.2}; // Front left
 	Diffuse wallMaterial6{cyan, 0.2}; // Front right
 
-	Diffuse ceilingMaterial{lightgray, 0.5};
-	Diffuse floorMaterial{lightgray, 0.5};
+	Diffuse ceilingMaterial{lightgray, 0.2};
+	Diffuse floorMaterial{lightgray, 0.2};
 
 	Mirror mirror{};
 	Diffuse boxMaterial{yellow, 0.2};
-	Diffuse boxMaterial2{yellow, 0.6}; //Easier to spot color-bleeding in tests
+	Diffuse boxMaterial2{cyan, 0.6}; //Easier to spot color-bleeding in tests
 	Diffuse border{black, 0.2};
-	Diffuse sphereMaterial{ cyan, 0.2 };
-	Transparent transparentMaterial{ purple, REFLECTIVE_INDEX_GLASS };
-	Transparent transparentMaterial2{ white, REFLECTIVE_INDEX_GLASS };
+	Diffuse sphereMaterial{ purple, 0.2 };
+	Diffuse sphereMaterial2{ teal, 0.2 };
+	Transparent transparentMaterial{ pink, REFLECTIVE_INDEX_GLASS };
+	Transparent transparentMaterial2{ black, REFLECTIVE_INDEX_GLASS };
 
-	LightSource light{white, 100};
+	LightSource light{white, 75};
 
 	//Here we add all cordinates for the room and add all the objects like camera, mirror, balls etc
 
-	//----All cordiantes for the room (TODO -> floor and ceiling mixed up for some reason?)----//
+	//----All cordiantes for the room (TODO -> floor and ceiling mixed up for some reason.. LÖST, behövs bara ändras)----//
 	// floor
 	const glm::vec3 P0{0.0f, 6.0f, 5.0f};
 	const glm::vec3 P1{-3.0f, 0.0f, 5.0f}; 
@@ -55,22 +56,25 @@ void Room::create_Room() {
 	const glm::vec3 PF{5.0f, 0.0f, -5.0f}; //center vertex
 
 	//light
-
+	
 	const glm::vec3 P12{ 6.0f, 1.0f, -4.8f };
     const glm::vec3 P13{ 5.0f, -1.0f, -4.8f };
     const glm::vec3 P14{ 5.0f, 1.0f, -4.8f };
     const glm::vec3 P15{ 6.0f, -1.0f, -4.8f };
-	/*
-	const glm::vec3 P12{ 6.5f, 1.5f, -4.8f }; //scaling the light to be bigger
-    const glm::vec3 P13{ 4.5f, -1.5f, -4.8f };
-    const glm::vec3 P14{ 4.5f, 1.5f, -4.8f };
-    const glm::vec3 P15{ 6.5f, -1.5f, -4.8f };
 	
-	const glm::vec3 P12{ 6.0f, 5.0f, -4.98f }; //light attenuation test(move light to right side)
-    const glm::vec3 P13{ 5.0f, 3.0f, -4.98f };
-    const glm::vec3 P14{ 5.0f, 5.0f, -4.98f };
-    const glm::vec3 P15{ 6.0f, 3.0f, -4.98f };
+	/*
+	const glm::vec3 P12{ 6.5f, 2.5f, -4.8f }; //scaling the light to be bigger
+    const glm::vec3 P13{ 4.5f, -2.5f, -4.8f };
+    const glm::vec3 P14{ 4.5f, 2.5f, -4.8f };
+    const glm::vec3 P15{ 6.5f, -2.5f, -4.8f };
 	*/
+	/*
+	const glm::vec3 P12{ 6.0f, 5.0f, -4.96f }; //light attenuation test(move light to right side)
+    const glm::vec3 P13{ 5.0f, 3.0f, -4.96f };
+    const glm::vec3 P14{ 5.0f, 5.0f, -4.96f };
+    const glm::vec3 P15{ 6.0f, 3.0f, -4.96f };
+	*/
+
 	//light border
 	const glm::vec3 P17{ 5.0f, 1.0f, 4.8f };
     const glm::vec3 P18{ 5.0f, 1.0f, 4.8f };
@@ -170,14 +174,25 @@ void Room::create_Room() {
     scene.addPolygon(&triangle26);
     scene.addPolygon(&triangle27);
     scene.addPolygon(&triangle28); */
-/*	
-Z
-^
-|
-|
-|
 
-*/
+//adding one sphere of each material for testing O O O
+
+	Sphere sL{ glm::vec3(5.0f, -3.5f, 2.3f), 1.5f, &mirror };
+	scene.addPolygon(&sL);
+
+	Sphere sM{ glm::vec3(5.0f, 0.0f, 2.3f), 1.5f, &transparentMaterial };
+	scene.addPolygon(&sM);
+
+	Sphere sR{ glm::vec3(5.0f, 3.5f, 2.3f), 1.5f, &sphereMaterial2 };
+	scene.addPolygon(&sR);
+
+	Sphere sB{ glm::vec3(8.0f, 0.5f, 1.3f), 1.0f, &sphereMaterial };
+	scene.addPolygon(&sB);
+
+	//Box b2 = Box(glm::vec3(8.5f, 0.0f, 2.5f), 5.0f, 1.5f, 0.5f, &boxMaterial2);
+	//scene.addBox(&b2);
+
+
 	// add box
 	//Box b1 = Box(glm::vec3(6.0f, -1.0f, 2.0f), 2.5f, 2.5f, 2.5f, &transparentMaterial2);
 	//scene.addBox(&b1);
@@ -185,18 +200,18 @@ Z
 	//Box b2 = Box(glm::vec3(7.2f, 2.5f, 2.5f), 5.0f, 1.5f, 1.5f, &boxMaterial2);
 	//scene.addBox(&b2);
 	
-	Sphere s0{ glm::vec3(6.0f, -2.0f, -0.5f), 1.5f, &transparentMaterial2 };
-	scene.addPolygon(&s0);
+	//Sphere s0{ glm::vec3(6.0f, -2.0f, -0.5f), 1.5f, &transparentMaterial2 };
+	//scene.addPolygon(&s0);
 
 	// transparent sphere right side
-	Sphere s1{ glm::vec3(7.3f, 3.5f, 3.97f), 2.0f, &transparentMaterial2 };
+	/* Sphere s1{ glm::vec3(5.0f, 1.5f, 1.5f), 1.5f, &transparentMaterial2 };
 	scene.addPolygon(&s1);
 
-	Sphere s2{ glm::vec3(8.5f, -2.8f, 3.97f), 2.0f, &mirror };
+	Sphere s2{ glm::vec3(8.0f, -4.5f, 2.5f), 2.5f, &mirror };
 	scene.addPolygon(&s2);
 
-	//Sphere s3{ glm::vec3(6.0f, 1.5f, 2.0f), 1.0f, &sphereMaterial };
-	//scene.addPolygon(&s3);
+	Sphere s3{ glm::vec3(7.5f, 0.5f, 2.7f), 0.5f, &sphereMaterial };
+	scene.addPolygon(&s3); */
 
 	std::cout << "----Rendering scene----" << std::endl;
 	auto start_time{ std::chrono::high_resolution_clock::now() };

@@ -82,35 +82,44 @@ float Sphere::rayIntersection(Ray* ray) const
        // All dot products for the quadratic formula
     glm::vec3 dot_prods{};
 
-    dot_prods.x = glm::dot(ray->direction, ray->direction);
-    dot_prods.y = 2.0f * glm::dot(ray->startpoint - this->position, ray->direction);
-    dot_prods.z = glm::dot(ray->startpoint - this->position, ray->startpoint - this->position) - this->radius * this->radius;
+    glm::vec3 oc{ ray->startpoint - this->position }; // position is center of the sphere
 
-    // The dicriminant which check for hits
-    float discriminant = dot_prods.y * dot_prods.y - 4.0f * dot_prods.x * dot_prods.z;
+    glm::vec3 dir{ glm::normalize(ray->direction) }; // makes sure direction vector is normalized.
 
-    // If determinant < 0: No hit, If ==0, It scraped along the surface
+    dot_prods.x = glm::dot(dir, dir);
+    dot_prods.y = 2.0f * glm::dot(oc, dir);
+    dot_prods.z = glm::dot(oc, oc) - this->radius * this->radius;
+
+    // The dicriminant which checks for hits
+    float discriminant = (dot_prods.y * dot_prods.y) - (4.0f * dot_prods.x * dot_prods.z);
+
+    // If determinant < 0: No hit, If == 0, It scraped along the surface
     if (discriminant < epsilon) {
         return -1.0f;
     }
     //TODO om vi får en negativ och en positiv t så skjuts ray inifrån sfären
     //Alltså går det inte att göra om negativa värden på t till 0 och sedan ta minsta av t_neg och t_pos
-    float t_neg = -(dot_prods.y / 2.0f * dot_prods.x) - sqrt(discriminant);
-    float t_pos = -(dot_prods.y / 2.0f * dot_prods.x) + sqrt(discriminant);
+    //float t_neg = -(dot_prods.y / 2.0f * dot_prods.x) - sqrt(discriminant);
+    //float t_pos = -(dot_prods.y / 2.0f * dot_prods.x) + sqrt(discriminant);
 
-    // float t_neg = (-dot_prods.y - sqrt(discriminant)) / (2.0f * dot_prods.x);
-    // float t_pos = (-dot_prods.y + sqrt(discriminant)) / (2.0f * dot_prods.x);
+    float t_neg = (-dot_prods.y - sqrt(discriminant)) / (2.0f * dot_prods.x);
+    float t_pos = (-dot_prods.y + sqrt(discriminant)) / (2.0f * dot_prods.x);
 
-    t_neg = glm::max(t_neg, 0.0f);
-    t_pos = glm::max(t_pos, 0.0f);
+    if(t_neg > epsilon && t_pos > epsilon) {return glm::min(t_neg, t_pos);}
+    else if(t_neg > epsilon && t_pos < epsilon){return t_neg;}
+    else if(t_neg < epsilon && t_pos > epsilon){return t_pos;}
 
-    float t_true = glm::min(t_neg, t_pos);
+   // t_neg = glm::max(t_neg, 0.0f);
+   // t_pos = glm::max(t_pos, 0.0f);
+
+
+    //float t_true = glm::min(t_neg, t_pos);
 
     // Check if hit was behind camera, we dont want that
-    if (t_true > epsilon)
-    {
-        return t_true;
-    }
+   // if (t_true > epsilon)
+    //{
+      //  return t_true;
+    //}
 
     return -1.0f;
 }

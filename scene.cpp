@@ -81,7 +81,7 @@
                     double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
 
                     lightRadiance += ((l->material->flux / l->getArea()) / M_PI) * l->getArea() * cos_term * l->material->color / (dropoff * lights.size());
-                
+            
                 }
                 
             }
