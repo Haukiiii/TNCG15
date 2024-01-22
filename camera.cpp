@@ -8,6 +8,11 @@ Camera::Camera(glm::vec3 eye) : eye{ eye } {
 	cameraPlane[1][0] = glm::vec3(0.0f, -1.0f, 1.0f); //Top left corner
 	cameraPlane[1][1] = glm::vec3(0.0f, 1.0f, 1.0f); //Top right corner
 
+    //cameraPlane[1][0] = glm::vec3(0.0f, -1.0f, -1.0f); //Bottom left corner
+    //cameraPlane[1][1] = glm::vec3(0.0f, 1.0f, -1.0f); //Bottom right corner
+	//cameraPlane[0][0] = glm::vec3(0.0f, -1.0f, 1.0f); //Top left corner
+	//cameraPlane[0][1] = glm::vec3(0.0f, 1.0f, 1.0f); //Top right corner
+
     pixels = new std::array<Pixel, res*res>(); 
     pixels->fill(Pixel{ glm::dvec3(0.0, 0.0, 0.0) }); //may not be needed (ensure pixels initialized with black)
 }   
@@ -28,7 +33,7 @@ void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t
     for(size_t j = yLowerBound; j < yUpperBound; ++j) {
         for(size_t i = xLowerBound; i < xUpperBound; ++i) {
             Pixel& p = getPixel(i, j);
-
+            std::cout << "PIXEL COLUMN: " << j << std::endl;//testing*****
             for(size_t k = 0; k < samples; ++k) { // generate multiple samples within each pixel
 
                 // Calculate coordinates of the sub-sample within the pixel (cordinates on the camera plane)
@@ -40,7 +45,7 @@ void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t
                 // Add a random vertical offset within the sub-sample
 				yPixelOffset += static_cast<float>(rand() / RAND_MAX)* pixel_sample_size;
 
-                glm::vec3 interSectionPixel(0.0f, xPixelOffset, yPixelOffset); //The point in the cameraplane where the ray "ends"
+                glm::vec3 interSectionPixel{0.0f, xPixelOffset, yPixelOffset}; //The point in the cameraplane where the ray "ends"
                 Ray ray{start, interSectionPixel}; 
 
                 scene.rayTarget(ray); //this sets endpoint of the ray, which intersects the closest object, surface intersection information stored in ray->target
@@ -49,16 +54,10 @@ void Camera::render(Scene& scene, size_t xLowerBound, size_t xUpperBound, size_t
 
                 scene.traceRay(ray_ptr);
 
-                p.pixelColor += ray_ptr->radiance / static_cast<double>(samples);
-				ray_ptr.reset();
-
-                /* if(ray.target != nullptr){ //undvik eventuella nullptr, ska inte förekomma egentligen men verkar göra det?...
-        
-                    p.pixelColor = ray.target->material->color;
-                } */
-                
-               
+                p.pixelColor += ray_ptr->radiance;
+				ray_ptr.reset();                
             }
+            p.pixelColor /= static_cast<double>(samples);
         }
     }
     createImage();
@@ -74,11 +73,22 @@ void Camera::createImage() {
 
     // Write the PPM header information (P3 format for color images).
     imageFile << "P3\n" << res << " " << res << "\n255\n";
+    double max_intensity{0.0};
 
     // Iterate over each pixel and write its color to the image file.
     for (int j = 0; j < res; ++j) {
         for (int i = 0; i < res; ++i) {
-            Pixel& p = getPixel(i, j);
+            Pixel& p = getPixel(i, j); // minus to flip image Pixel& p = getPixel(res-1-i, res-1-j);
+
+             p.pixelColor = glm::sqrt(p.pixelColor);	// Color balancing
+
+            if (p.pixelColor.r > max_intensity)
+				max_intensity = p.pixelColor.r;
+			if (p.pixelColor.g > max_intensity)
+				max_intensity = p.pixelColor.g;
+			if (p.pixelColor.b > max_intensity)
+				max_intensity = p.pixelColor.b;
+
             int r = static_cast<int>(255.999 * p.pixelColor.r);
             int g = static_cast<int>(255.999 * p.pixelColor.g);
             int b = static_cast<int>(255.999 * p.pixelColor.b);

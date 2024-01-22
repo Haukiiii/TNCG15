@@ -1,30 +1,29 @@
 #pragma once
 #include "dependencies.hpp"
 
-struct Ray : public std::enable_shared_from_this<Ray>{ //to use share_from_this() in countRays().
+struct Ray { 
 
 glm::vec3 startpoint;
 glm::vec3 endpoint;
 glm::vec3 direction;
-
+glm::dvec3 radiance;
 double importance;
-double radiance;
 
+bool inside_transparent_object{ false };
 Polygon* target; //used to store information about the object or surface that the ray intersects.
-std::shared_ptr<Ray> prev; //ptr to previous ray
-std::shared_ptr<Ray> next; //ptr to next ray
+
+//---variables for tree datastructure---//
+bool is_leaf{ false }; // if the ray is the last
 
 int depth{ 0 }; // check the depth of tree
-bool is_leaf{ false }; // if the ray is the last
+std::shared_ptr<Ray> parent; //ptr to parent ray.
+std::vector<std::shared_ptr<Ray>> children; //vector with all child-nodes of the ray.
 
 //constructors
 Ray() = default;
 Ray(glm::vec3 startpoint, glm::vec3 endpoint);
-Ray(glm::vec3 startpoint, glm::vec3 endpoint, double importance);
+Ray(glm::vec3 startpoint, glm::vec3 direction, double importance);
 
-//
-void setEndpoint(float t);
+void setEndpoint(float t); //sets endpoint of the ray using parameter t
 
-int countRays(); //returns number of rays in list of current ray. 
-//Alternativt lägg till en count variabel i ray som håller koll på antalet rays i listan...?
 };

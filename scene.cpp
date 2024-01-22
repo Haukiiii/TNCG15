@@ -1,15 +1,12 @@
 #include "dependencies.hpp"
 
-    void Scene::addPolygon(Polygon* pol){
-        polygons.push_back(pol);
-    }
-
-    //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
+ //iterates through all objects in the scene, checks for intersections between the ray and each object. keeps track of the closest intersection point found
     void Scene::rayTarget(Ray& ray) const{
-
+        
         float closest_pol = std::numeric_limits<double>::max();
 
         for(Polygon* pol : this->polygons){
+            
             float X_intersection = pol->rayIntersection(&ray); //is -1.0 if there is no intersection (see rayIntersection)
             if(X_intersection > 0.0f && X_intersection < closest_pol){
                 closest_pol = X_intersection;
@@ -18,153 +15,145 @@
             }
         }
     }
-    
-    void Scene::traceRay(std::shared_ptr<Ray>& head) const {
-        std::shared_ptr<Ray> currentRay = head;
-        while(true)
-        {
-            //No reflections --> generate reflection rays
-            if(currentRay->next == nullptr){
-                this->rayTarget(*currentRay); //get closest intersection
-                if(currentRay->target == nullptr) {break;} //avoid bug..?
 
-                currentRay->next = currentRay->target->material->BRDF(currentRay); //ray generated based on the material's BRDF
-                //currentRay->next->prev = std::make_shared<Ray>(currentRay); //link nodes (kanske inte behövs?)****
-            }   
-            else //currentRay has reflections, can be intermidiate node in the list.
-            {
-                bool evaluate{true};
-                while(currentRay != nullptr) {
-                    if(currentRay->next != nullptr) { //currentRay needs evaluation
-                        currentRay = currentRay->next; //move along the list of rays
-                        evaluate = false;
-                        break;
+    void Scene::addBox(Box* box)
+    {
+        for (size_t i = 0; i < box->triangles.size(); ++i) {
+            addPolygon(&box->triangles[i]);
+        }
+    }
+
+    glm::dvec3 Scene::localLighting(const Ray& incomingRay) const {
+
+        glm::dvec3 terminalRadiance{ black };
+
+        if(incomingRay.target == nullptr) { return terminalRadiance; } //fixes bug when occasionally target is null.******
+
+        // If target is a lightsource simply return color of material
+        if(incomingRay.target->material->flux != 0.0) {
+            return incomingRay.target->material->color; 
+        }
+
+        for(Polygon* l : lights) //generate shadowrays going to all lightsources 
+        {
+            glm::dvec3 lightRadiance{ black };
+
+            glm::vec3 startShadow = incomingRay.endpoint + incomingRay.target->CalcUnitNormal(incomingRay.endpoint) * RAY_OFFSET; //startpoint of shadow is the incomingRay endpoint with slight offset to avoid intersection with target
+		    std::vector<Ray> shadowrays = l->generateShadowRays(startShadow); //generate shadowray(s)
+
+            //check occlusions by comparing distance to lightsource with distance to closest object in the scene, ignoring other light and transparent objects.
+            for(Ray& r : shadowrays) {
+
+                bool lightOccluded{false}; 
+
+                float lightDistance{glm::length(r.endpoint - r.startpoint)}; 
+
+                for(Polygon* geometry : polygons) //check if any geometry in the scene occludes the lightsource
+                {
+                    Ray compare{r}; //copy shadowray for comparison
+
+                    //make sure other lightsources and transparent objects are ignored 
+                    //if(geometry->material->flux == 0.0)
+                    if(dynamic_cast<const LightSource*>(geometry->material) == nullptr && dynamic_cast<const Transparent*>(geometry->material) == nullptr)
+                    {
+                        float intersection{geometry->rayIntersection(&r)};
+                        compare.setEndpoint(intersection);
+
+                        if(intersection > epsilon && lightDistance > glm::length(compare.endpoint - compare.startpoint)) {
+                            lightOccluded = true;
+                            break;
+                        }   
                     }
                 }
+                if(!lightOccluded) 
+                {
+                    //see lecture 7 setting up Irradiance estimator <E(x)>
+                    glm::vec3 targetNormal { incomingRay.target->CalcUnitNormal(incomingRay.endpoint) }; //Nx
+                    glm::vec3 lightNormal { l->CalcUnitNormal(r.endpoint) }; //Ny
+                    glm::vec3 r_direction {glm::normalize(r.endpoint - r.startpoint) }; // d/||d|| 
+                    
+                    // determinine how much of the incoming light contributes to the radiance at point
+                    double cos_light = glm::dot(r_direction, -lightNormal); // how well-aligned shadow ray direction is with the light source's surface normal.
+                    double cos_target = glm::dot(targetNormal, r_direction); // how well-aligned the surface normal is with the shadow ray direction
+                    double cos_term = cos_target * cos_light; // angle between surface normal and shadow ray direction
+                    cos_term = glm::max(cos_term, 0.0); // clamp to avoid negative numbers
 
-                if(evaluate) {
-                    while(currentRay->next != nullptr){
-                        currentRay->radiance += currentRay->next->radiance;
-                        currentRay = currentRay->next; 
-                        currentRay->next.reset();
-                    }
-                    if(currentRay == nullptr){
-                        currentRay.reset();
-                        break;
-                    }
-                    currentRay = currentRay->prev;
+                    double dropoff = glm::pow(glm::length(r.endpoint - r.startpoint), FLUX_DROPOFF); // to account for attenuation of light at distance 
+
+                    lightRadiance += ((l->material->flux / l->getArea()) / M_PI) * l->getArea() * cos_term * l->material->color / (dropoff * lights.size());
+            
                 }
                 
             }
+            terminalRadiance += (lightRadiance / static_cast<double>(shadowrays.size()));
         }
+        return terminalRadiance * incomingRay.target->material->color;
     }
+    
+    void Scene::traceRay(std::shared_ptr<Ray>& rootRay) const{
 
+        std::shared_ptr<Ray> currentRay = rootRay; //Start at the top of tree-structure
 
-      /*   while(true){
-            if(current_pol->importance < treshold_importance){
-                this ->rayTarget(*current_pol);
-                if (current_pol->target == nullptr) break;
-                current_pol->is_leaf = true;
-
-                // add ray gets color from material and add to radiance
-            }
-        } */
-
-        // TODO add else if and else statement 
-
-    /*
-    void Scene::traceRay(std::shared_ptr<Ray>& root) const
-{
-    std::shared_ptr<Ray> current = root;
-
-    while (true)
-    {
-        // Sets color from local lighting for leaf node
-        if (current->importance < threshold_importance)
+        while(true) 
         {
-            rayTarget(*current);
-
-            if (current->target == nullptr)
+            // Stop rays of importance below threshold
+            if(currentRay->importance < IMPORTANCE_THRESHOLD)
             {
-                break;
-            }
-            current->is_leaf = true;
+                rayTarget(*currentRay);
 
-            glm::dvec3 local_color = localLighting(*current);
-            current->radiance = glm::length(local_color);
-            current->color = local_color;
-            current = current->prev;  // Assuming you have a 'prev' member in the Ray class
-        }
-        // Create child rays if there are none and current isn't a leaf node
-        else if (current->next == nullptr)
-        {
-            rayTarget(*current);
-
-            if (current->target == nullptr)
-            {
-                break;
-            }
-            std::vector<Ray> child_rays = current->target->material->brdf(*current);
-
-            for (Ray& r : child_rays)
-            {
-                r.prev = current;
-                current->next = std::make_shared<Ray>(r);
-                current = current->next;
-            }
-        }
-        // Iterate through the child nodes, if they are all leaves, evaluate color, delete children, make current a leaf and set current to parent.
-        // If a child branch is not yet evaluated, evaluate that branch by setting current to that child.
-        else
-        {
-            bool evaluate = true;
-            std::shared_ptr<Ray> temp;
-
-            while (current->next != nullptr)
-            {
-                temp = current->next;
-                // if evaluation of child branch is needed
-                if (!temp->is_leaf)
-                {
-                    current = temp;
-                    evaluate = false;
-                    break;
-                }
-                current = temp;
+                currentRay->is_leaf = true;
+                
+                currentRay->radiance = localLighting(*currentRay);
+                currentRay = currentRay->parent; //move up the tree
             }
 
-            if (evaluate)
+            // Ray has no children (no branches yet), generate children
+            else if(currentRay->children.size() == 0)
             {
-                glm::dvec3 local_color = localLighting(*current);
-                current->radiance = glm::length(local_color);
+                rayTarget(*currentRay);
+                if(currentRay->target == nullptr) { break; } //removes occasional case where target is null (should not be needed, fix bug)
 
-                current = current->prev;  // Move back to the parent
-                while (current->next != nullptr)
+                std::vector<Ray> currentChildren{currentRay->target->material->BRDF(currentRay)}; // Generate child rays based on targets BRDF
+
+                for(Ray& r : currentChildren)
                 {
-                    current->radiance += current->next->radiance * current->next->importance / current->importance;
-                    current = current->next;
+                    r.parent = currentRay;
+                    currentRay->children.push_back(std::make_shared<Ray>(r));
+                }
+            }
+            else //Ray is an intermediate node and has children
+            {
+                bool doCompute{true};
+
+                // If at least one child needs computing, select the first one and sets currentRay to that child, effectively descending further down the tree.
+                for(std::shared_ptr<Ray>& c : currentRay->children) 
+                {
+                    if(!c->is_leaf)
+                    {
+                        currentRay = c;
+                        doCompute = false;
+                        break;
+                    }
+                }
+                if(doCompute)
+                {
+                    currentRay->radiance = localLighting(*currentRay);
+                    for(std::shared_ptr<Ray>& c : currentRay->children) 
+                    {
+                        currentRay->radiance += c->radiance * c->importance / currentRay->importance * 0.7; //adjust constant for global light contribution
+					    c.reset(); //free memory
+                    }
+
+                    //currentRay is root Ray
+                    if(currentRay->parent == nullptr)
+                    {
+                        currentRay.reset(); //free memory
+                        break;
+                    }
+                currentRay->is_leaf = true;
+                currentRay = currentRay->parent;
                 }
 
-                current = current->prev;  // Move back to the parent
-                current->color = local_color * current->radiance;
-                while (current->next != nullptr)
-                {
-                    current->color += current->next->color * g_color_contribution;
-                    current->next.reset();
-                    current = current->prev;
-                }
-
-                // Reached the root
-                if (current->prev == nullptr)
-                {
-                    current.reset();  // Current and root points to the same ray, delete the extra node
-                    break;
-                    // End
-                }
-                current->is_leaf = true;
-                current = current->prev;
             }
         }
     }
-}
-    */
